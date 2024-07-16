@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 // import uploadRoutes from './routes/uploads.route.js';
-import userRouter from './routes/user.route.js'
+import TeacherUser from './routes/TeacherUser.route.js'
+import StudentUser from './routes/StudentUser.route.js'
 import forgotPasswordRouter from './routes/forgotPassword.route.js'
 
 // App config
@@ -36,7 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // API Endpoints
-app.use("/api/user", userRouter)
+app.use("/api/user/Teacher", TeacherUser)
+app.use("/api/user/Student", StudentUser)
 app.use("/api/forgotPassword", forgotPasswordRouter)
 // app.use("/api/uploads", uploadRoutes)
 

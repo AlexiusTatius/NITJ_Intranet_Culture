@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.homepage-ts {
+    @apply w-full min-h-[90vh] min-w-[90vh] bg-[#b1f5d2] pt-[100px] pb-[100px] bg-opacity-85;
+}
+
+.homepage-ts-container {
+    @apply w-[90%] max-w-[550px] bg-white m-auto p-[30px] box-border;
+    padding-right: 40px;
+    padding-left: 40px;
+}
+
+.homepage-ts-container h1 {
+    @apply my-[15px] text-black text-4xl font-bold border-b-2 border-gray-500 pb-2;
+}
+
+.homepage-ts-fields {
+    @apply flex flex-col gap-[25px] mt-[30px] mb-[30px];
+}
+
+.homepage-ts-button {
+    @apply w-full h-[60px] text-white bg-[#1d763b] border-none text-[22px] font-medium cursor-pointer;
+}
+
+@media (max-width: 600px) {
+    .homepage-ts-container h1 {
+        @apply text-[22px] m-0;
+    }
+    .homepage-ts-container {
+        @apply p-[30px];
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+    .homepage-ts-fields input {
+        @apply pl-[10px] text-[16px] h-[50px];
+    }
+    .homepage-ts-fields {
+        @apply gap-[15px];
+    }
+    .homepage-ts-button {
+        @apply h-[50px] mt-[20px] text-[17px];
+    }
+}

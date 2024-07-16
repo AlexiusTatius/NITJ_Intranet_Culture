@@ -1,5 +1,5 @@
 import fs from 'fs';
-import userModel from "../models/user.model.js";
+import TeacherUserModel from "../models/TeacherUser.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
@@ -17,8 +17,8 @@ const loginUser = async (req, res) => {
     try {
         if (!email || !password) {
             return res.status(400).json({ message: "Please enter all fields" })
-        }
-        const user = await userModel.findOne({ email })
+        }   
+        const user = await TeacherUserModel.findOne({ email })
 
         if (!user) {
             return res.status(400).json({ message: "User does not exist" })
@@ -37,14 +37,15 @@ const loginUser = async (req, res) => {
 
 //register user
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const {username, email, password } = req.body;
+    console.log(req.body);
     try {
         //check if user already exists
-        const exists = await userModel.findOne({ email })
+        const exists = await TeacherUserModel.findOne({ email })
         if (exists) {
             return res.status(400).json({ message: "User already exists" })
         }
-        if (validator.isEmpty(name) || validator.isEmpty(email) || validator.isEmpty(password)) {
+        if (validator.isEmpty(username) || validator.isEmpty(email) || validator.isEmpty(password)) {
             return res.status(400).json({ message: "Please enter all fields" })
         }
         if (!validator.isEmail(email)) {
@@ -56,14 +57,14 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const dirPath = `./TeacherFolders/${email}-${name}/All_Files`;
+        const dirPath = `./TeacherFolders/${email}-${username}/All_Files`;
 
         fs.mkdir(dirPath, { recursive: true }, (err) => {
             if (err) {
                 throw Error('Could not create directory for user');
             }
         });
-        const newUser = new userModel({ name, email, password: hashedPassword, folderPath: dirPath })
+        const newUser = new TeacherUserModel({ username, email, password: hashedPassword, folderPath: dirPath })
         const user = await newUser.save()
         const token = createToken(user._id)
         res.status(200).json({ user, token })
@@ -77,7 +78,7 @@ const registerUser = async (req, res) => {
 const getUser = async (req, res) => {
     const id = req.user.id
     try {
-        const user = await userModel.find({ _id: id })
+        const user = await TeacherUserModel.find({ _id: id })
         res.status(200).json({ user: user[0] })
     } catch (error) {
         res.status(502).json({ message: error.message })

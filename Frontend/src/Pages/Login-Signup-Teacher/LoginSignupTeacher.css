@@ -1,0 +1,62 @@
+/* Tailwind CSS for the login/signup component */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.loginsignup {
+    @apply w-full min-h-[90vh] min-w-[90vh] bg-[#b1f5d2] pt-[100px] pb-[100px] bg-opacity-85;
+}
+
+.loginsignup-container {
+    @apply w-[90%] max-w-[550px] bg-white m-auto p-[30px] box-border;
+    padding-right: 40px;
+    padding-left: 40px;
+}
+
+.loginsignup-container h1 {
+    @apply my-[15px] text-black text-4xl font-bold border-b-2 border-gray-500 pb-2;
+}
+
+.loginsignup-fields {
+    @apply flex flex-col gap-[25px] mt-[20px];
+}
+
+.loginsignup-fields input {
+    @apply h-[60px] w-full pl-[20px] border-2 border-[#1b891f] outline-none text-[#fcfcfc] text-[20px] box-border bg-gray-600 rounded-lg ;
+}
+
+.loginsignup-container button {
+    @apply w-full h-[60px] text-white bg-[#1d763b] mt-[30px] border-none text-[22px] font-medium cursor-pointer;
+}
+
+.loginsignup-login {
+    @apply mt-[20px] text-[#5c5c5c] text-[16px] font-medium;
+}
+
+.loginsignup-login span {
+    @apply text-[#1e8478] font-semibold;
+}
+
+.loginsignup-agree {
+    @apply flex items-center mt-[18px] gap-[10px] text-[#5c5c5c] text-[15px] font-medium;
+}
+
+@media (max-width: 600px) {
+    .loginsignup-container h1 {
+        @apply text-[22px] m-0;
+    }
+    .loginsignup-container {
+        @apply p-[30px];
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+    .loginsignup-fields input {
+        @apply pl-[10px] text-[16px] h-[50px];
+    }
+    .loginsignup-fields {
+        @apply gap-[15px];
+    }
+    .loginsignup-container button {
+        @apply h-[50px] mt-[20px] text-[17px];
+    }
+}
