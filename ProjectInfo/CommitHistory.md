@@ -26,3 +26,11 @@
       and student were be updated.
     - Commits of front-page-TS were squashed and merged with log-sin-f.
     
+7. Since everything in the log-sin-f branch was working fine, I merged it with the master branch.   (17th July, 2024)
+    - I currently don't know whether I should delete the log-sin-f branch or not.
+
+8. Created a new branch called teacher-backend-auth-n-API
+    - Build a robust authentication system middleware for the teachers and students
+    - Built and properly test the following API's
+        1. Create, Delete, Rename a folder.
+        2. Upload, Delete, Download files.

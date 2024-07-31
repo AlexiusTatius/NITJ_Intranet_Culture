@@ -1,0 +1,9 @@
+# Ignore node_modules directories
+Frontend/node_modules/
+Backend/node_modules/
+
+# Ignore .env file in backend
+Backend/.env
+
+# Ignore contents of TeacherFolders but keep the directory itself
+Backend/TeacherFolders/

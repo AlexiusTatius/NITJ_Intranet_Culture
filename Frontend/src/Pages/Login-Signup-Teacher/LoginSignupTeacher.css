@@ -37,6 +37,14 @@
     @apply text-[#1e8478] font-semibold;
 }
 
+.loginsignup-forgot {
+    @apply mt-[10px] text-[#5c5c5c] text-[16px] font-medium;
+}
+
+.loginsignup-forgot span {
+    @apply text-[#1e8478] font-semibold;
+}
+
 .loginsignup-agree {
     @apply flex items-center mt-[18px] gap-[10px] text-[#5c5c5c] text-[15px] font-medium;
 }

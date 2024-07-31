@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from "react";  
+import {Link } from "react-router-dom";
 import "./LoginSignupTeacher.css";
 
 // check your requests on http dump
@@ -33,7 +34,7 @@ const login = async () => {
     console.log("Login: ",dataObj);
     if (dataObj.success) {
       localStorage.setItem('auth-token', dataObj.token);
-      window.location.replace('/');
+      // window.location.replace('/');   // Must not redirect to home page after signup
     } else {
       alert(dataObj.errors);
     }
@@ -61,9 +62,11 @@ const login = async () => {
           },
       });
       const dataObj = response.data;
+      console.log("response: ",dataObj);
+
       if (dataObj.success) {
         localStorage.setItem('auth-token', dataObj.token);
-        window.location.replace('/');
+        // window.location.replace('/');   // Must not redirect to home page after signup
       } else {
         alert(dataObj.errors);
       }
@@ -96,7 +99,10 @@ const login = async () => {
         <button onClick={()=>{state==="Login"?login():signup()}}>Continue</button>
 
         {state==="Login"?
-        <p className="loginsignup-login">Create an account? <span onClick={toggleState}>SignUp here</span></p>    // Here the state changes so component re-renders
+          <div>
+           <p className="loginsignup-login">Create an account? <span onClick={toggleState}>SignUp here</span></p>   {/* // Here the state changes so component re-renders */}
+           <p className="loginsignup-forgot">Forgot your Password? <Link to="/user/ForgotPassword"><span>Forgot Password</span></Link></p>
+          </div>
         :<p className="loginsignup-login">Already have an account? <span onClick={toggleState}>LogIn here</span></p>}
 
       </div>

@@ -3,13 +3,11 @@ import express from 'express';
 import dotenv from "dotenv"
 import mongoose from 'mongoose';
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
 // import uploadRoutes from './routes/uploads.route.js';
-import TeacherUser from './routes/TeacherUser.route.js'
-import StudentUser from './routes/StudentUser.route.js'
-import forgotPasswordRouter from './routes/forgotPassword.route.js'
+import TeacherUserRoute from './routes/UserRoutes/TeacherUser.route.js'
+import StudentUserRoute from './routes/UserRoutes/StudentUser.route.js'
+import forgotPasswordRoute from './routes/UserRoutes/forgotPassword.route.js'
+
 
 // App config
 dotenv.config()
@@ -17,10 +15,6 @@ const app = express()
 const port = process.env.PORT || 8000
 mongoose.set('strictQuery', true);
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-global.__basedir = __dirname;
 
 //db config
 mongoose.connect(process.env.MONGO_URI)  // Here I don't have to specify the database name, it will be created automatically
@@ -37,9 +31,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // API Endpoints
-app.use("/api/user/Teacher", TeacherUser)
-app.use("/api/user/Student", StudentUser)
-app.use("/api/forgotPassword", forgotPasswordRouter)
+app.use("/api/user/Teacher", TeacherUserRoute)
+app.use("/api/user/Student", StudentUserRoute)
+app.use("/api/user/forgotPassword", forgotPasswordRoute)
 // app.use("/api/uploads", uploadRoutes)
 
 app.listen(port, () => {
