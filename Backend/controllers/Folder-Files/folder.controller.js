@@ -1,8 +1,8 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { isValidObjectId } from 'mongoose';
 import FolderModel from '../../models/File-Folder/Folder.model.js';
 import FileModel from '../../models/File-Folder/File.model.js';
+import { isValidObjectId } from 'mongoose';
+import fs from 'fs/promises';
+import path from 'path';
 import { TeacherFolderDir } from '../../config.js';
 
 // There will always be a parent folder ( root folder ) for each user, in this case the root folder
@@ -270,7 +270,58 @@ const renameFolder = async (req, res) => {
 };
 
 
-export { createFolder, deleteFolder, renameFolder };
+const getFolderStructure = async (req, res) => {
+  try {
+      const userId = req.user._id;
+      const { folderId } = req.params; // Assuming the folder ID is passed as a route parameter
 
+      let targetFolder;
+      if (folderId === 'root') {
+          // If 'root' is specified, find the root folder for the user
+          targetFolder = await FolderModel.findOne({ owner: userId, parentFolder: null }).lean();
+      } else {
+          // Otherwise, find the specified folder
+          targetFolder = await FolderModel.findOne({ _id: folderId, owner: userId }).lean();
+      }
 
+      if (!targetFolder) {
+          return res.status(404).json({ error: 'Folder not found' });
+      }
 
+      // Get all subfolders of the target folder
+      const subFolders = await FolderModel.find({ 
+          owner: userId, 
+          path: { $regex: `^${escapeRegExp(targetFolder.path)}(\\\\|$)` }
+      }).lean();
+
+      // Get all files in the target folder
+      const files = await FileModel.find({ 
+          owner: userId, 
+          parentFolder: targetFolder._id
+      }).lean();
+
+      // Create a map of folders by their ID for easy access
+      const folderMap = new Map(subFolders.map(folder => [folder._id.toString(), { ...folder, children: [], files: [] }]));
+
+      // Organize folders into a tree structure
+      const rootFolder = folderMap.get(targetFolder._id.toString()) || { ...targetFolder, children: [], files: [] };
+      subFolders.forEach(folder => {
+          if (folder._id.toString() !== targetFolder._id.toString()) {
+              const parentFolder = folderMap.get(folder.parentFolder.toString());
+              if (parentFolder) {
+                  parentFolder.children.push(folderMap.get(folder._id.toString()));
+              }
+          }
+      });
+
+      // Add files to the target folder
+      rootFolder.files = files;
+
+      res.status(200).json({ folderStructure: rootFolder });
+  } catch (error) {
+      console.error('Error fetching folder structure:', error);
+      res.status(500).json({ error: 'An error occurred while fetching the folder structure' });
+  }
+};
+
+export { createFolder, deleteFolder, renameFolder, getFolderStructure};

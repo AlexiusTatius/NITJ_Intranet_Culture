@@ -1,21 +1,31 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+@layer components {
+  #root {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .logo {
+    @apply h-16 transition-all duration-300 ease-in-out;
+  }
+
+  .logo:hover {
+    @apply filter drop-shadow-md;
+  }
+
+  .logo.react:hover {
+    @apply filter drop-shadow-lg;
+  }
+
+  .card {
+    @apply p-6 bg-white rounded-lg shadow-md;
+  }
+
+  .read-the-docs {
+    @apply text-sm text-gray-500 mt-4;
+  }
 }
 
 @keyframes logo-spin {
@@ -33,10 +43,16 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
+@media (max-width: 640px) {
+  #root {
+    @apply px-4;
+  }
 
-.read-the-docs {
-  color: #888;
+  .logo {
+    @apply h-12;
+  }
+
+  .card {
+    @apply p-4;
+  }
 }

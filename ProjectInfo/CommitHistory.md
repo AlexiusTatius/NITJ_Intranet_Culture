@@ -34,3 +34,22 @@
     - Built and properly test the following API's
         1. Create, Delete, Rename a folder.
         2. Upload, Delete, Download files.
+
+9. Renamed the teacher-backend-auth-n-API to teacher-portal:
+    - Added the Teacher API's to fetch the folders and files.
+    - Doing this commit in teacher-portal branch.
+    - I will merge the teacher portal branch with the master branch after building the whole teacher portal.
+
+10. I don't remember what were the changes in the previous branches, but now I will keep a clear track. 
+    So here's what's going to happend:
+    - I am on T-frontend-Beautify branch.
+    - I will commit all the changes (the current state of the project) in the T-frontend-Beautify branch.
+    - Then I will merge the T-frontend-Beautify branch with the master branch.
+
+    Now let's see what changes I have made in the T-frontend-Beautify branch:
+    - Implemented the All_Files functionality, to full extent, 
+      according to the backend API's. (Hope there's no bugs)
+    - Made the components and pages in frontend
+    - In the backend file.controller.js and 
+      folder.controller.js were updated.
+

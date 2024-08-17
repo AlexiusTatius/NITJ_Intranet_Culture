@@ -1,0 +1,262 @@
+{
+    "folderStructure": [
+        {
+            "_id": "66b2615a41f0cc371a6407aa",
+            "name": "Root",
+            "parentFolder": null,
+            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root",
+            "owner": "66b2615a41f0cc371a6407a8",
+            "createdAt": "2024-08-06T17:46:02.232Z",
+            "updatedAt": "2024-08-06T17:46:02.232Z",
+            "__v": 0,
+            "children": [
+                {
+                    "_id": "66b2618541f0cc371a6407ae",
+                    "name": "Folder_A",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-06T17:46:45.543Z",
+                    "updatedAt": "2024-08-06T17:46:45.543Z",
+                    "__v": 0,
+                    "children": [
+                        {
+                            "_id": "66bb1ac94aaa26a924006233",
+                            "name": "Folder_Alpha",
+                            "parentFolder": "66b2618541f0cc371a6407ae",
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\Folder_Alpha",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:35:21.267Z",
+                            "updatedAt": "2024-08-13T08:35:21.267Z",
+                            "__v": 0,
+                            "children": [],
+                            "files": []
+                        },
+                        {
+                            "_id": "66bb1ad14aaa26a924006236",
+                            "name": "Folder_Beta",
+                            "parentFolder": "66b2618541f0cc371a6407ae",
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\Folder_Beta",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:35:29.224Z",
+                            "updatedAt": "2024-08-13T08:35:29.224Z",
+                            "__v": 0,
+                            "children": [],
+                            "files": [
+                                {
+                                    "_id": "66bb1bc44aaa26a924006253",
+                                    "name": "pdf1",
+                                    "parentFolder": "66bb1ad14aaa26a924006236",
+                                    "mimeType": "application/pdf",
+                                    "size": 51745,
+                                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\Folder_Beta\\\\pdf1.pdf",
+                                    "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_A\\Folder_Beta\\pdf1.pdf",
+                                    "owner": "66b2615a41f0cc371a6407a8",
+                                    "createdAt": "2024-08-13T08:39:32.121Z",
+                                    "updatedAt": "2024-08-13T08:39:32.121Z",
+                                    "__v": 0
+                                },
+                                {
+                                    "_id": "66bb1bc44aaa26a924006255",
+                                    "name": "pdf4",
+                                    "parentFolder": "66bb1ad14aaa26a924006236",
+                                    "mimeType": "application/pdf",
+                                    "size": 51745,
+                                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\Folder_Beta\\\\pdf4.pdf",
+                                    "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_A\\Folder_Beta\\pdf4.pdf",
+                                    "owner": "66b2615a41f0cc371a6407a8",
+                                    "createdAt": "2024-08-13T08:39:32.159Z",
+                                    "updatedAt": "2024-08-13T08:39:32.159Z",
+                                    "__v": 0
+                                }
+                            ]
+                        }
+                    ],
+                    "files": [
+                        {
+                            "_id": "66bb1bd84aaa26a92400625e",
+                            "name": "pdf1",
+                            "parentFolder": "66b2618541f0cc371a6407ae",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\pdf1.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_A\\pdf1.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:39:52.008Z",
+                            "updatedAt": "2024-08-13T08:39:52.008Z",
+                            "__v": 0
+                        },
+                        {
+                            "_id": "66bb1bd84aaa26a924006260",
+                            "name": "pdf4",
+                            "parentFolder": "66b2618541f0cc371a6407ae",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_A\\\\pdf4.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_A\\pdf4.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:39:52.046Z",
+                            "updatedAt": "2024-08-13T08:39:52.046Z",
+                            "__v": 0
+                        }
+                    ]
+                },
+                {
+                    "_id": "66b2618e41f0cc371a6407b1",
+                    "name": "Renamed_Folder_B",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Renamed_Folder_B",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-06T17:46:54.552Z",
+                    "updatedAt": "2024-08-06T18:01:09.808Z",
+                    "__v": 0,
+                    "children": [
+                        {
+                            "_id": "66b2630441f0cc371a6407c2",
+                            "name": "Sub_Folder_1",
+                            "parentFolder": "66b2618e41f0cc371a6407b1",
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Renamed_Folder_B\\\\Sub_Folder_1",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-06T17:53:08.193Z",
+                            "updatedAt": "2024-08-06T18:01:09.808Z",
+                            "__v": 0,
+                            "children": [],
+                            "files": []
+                        },
+                        {
+                            "_id": "66b2630a41f0cc371a6407c5",
+                            "name": "Sub_Folder_2",
+                            "parentFolder": "66b2618e41f0cc371a6407b1",
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Renamed_Folder_B\\\\Sub_Folder_2",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-06T17:53:14.405Z",
+                            "updatedAt": "2024-08-06T18:01:09.808Z",
+                            "__v": 0,
+                            "children": [],
+                            "files": []
+                        }
+                    ],
+                    "files": [
+                        {
+                            "_id": "66b2635241f0cc371a6407ce",
+                            "name": "pdf1",
+                            "parentFolder": "66b2618e41f0cc371a6407b1",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Renamed_Folder_B\\\\pdf1.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_B\\pdf1.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-06T17:54:26.568Z",
+                            "updatedAt": "2024-08-06T18:01:09.859Z",
+                            "__v": 0
+                        },
+                        {
+                            "_id": "66b2635241f0cc371a6407d0",
+                            "name": "pdf4",
+                            "parentFolder": "66b2618e41f0cc371a6407b1",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Renamed_Folder_B\\\\pdf4.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_B\\pdf4.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-06T17:54:26.604Z",
+                            "updatedAt": "2024-08-06T18:01:09.859Z",
+                            "__v": 0
+                        }
+                    ]
+                },
+                {
+                    "_id": "66bb1b124aaa26a924006239",
+                    "name": "Folder_Unus",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_Unus",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-13T08:36:34.427Z",
+                    "updatedAt": "2024-08-13T08:36:34.427Z",
+                    "__v": 0,
+                    "children": [],
+                    "files": []
+                },
+                {
+                    "_id": "66bb1b1d4aaa26a92400623c",
+                    "name": "Folder_duo",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_duo",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-13T08:36:45.563Z",
+                    "updatedAt": "2024-08-13T08:36:45.563Z",
+                    "__v": 0,
+                    "children": [],
+                    "files": []
+                },
+                {
+                    "_id": "66bb1b284aaa26a92400623f",
+                    "name": "Folder_tres",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_tres",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-13T08:36:56.664Z",
+                    "updatedAt": "2024-08-13T08:36:56.664Z",
+                    "__v": 0,
+                    "children": [],
+                    "files": [
+                        {
+                            "_id": "66bb1ba04aaa26a924006248",
+                            "name": "pdf1",
+                            "parentFolder": "66bb1b284aaa26a92400623f",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_tres\\\\pdf1.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_tres\\pdf1.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:38:56.096Z",
+                            "updatedAt": "2024-08-13T08:38:56.096Z",
+                            "__v": 0
+                        },
+                        {
+                            "_id": "66bb1ba04aaa26a92400624a",
+                            "name": "pdf4",
+                            "parentFolder": "66bb1b284aaa26a92400623f",
+                            "mimeType": "application/pdf",
+                            "size": 51745,
+                            "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\Folder_tres\\\\pdf4.pdf",
+                            "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\Folder_tres\\pdf4.pdf",
+                            "owner": "66b2615a41f0cc371a6407a8",
+                            "createdAt": "2024-08-13T08:38:56.158Z",
+                            "updatedAt": "2024-08-13T08:38:56.158Z",
+                            "__v": 0
+                        }
+                    ]
+                }
+            ],
+            "files": [
+                {
+                    "_id": "66b261ca41f0cc371a6407bb",
+                    "name": "pdf1",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "mimeType": "application/pdf",
+                    "size": 51745,
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\pdf1.pdf",
+                    "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\pdf1.pdf",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-06T17:47:54.318Z",
+                    "updatedAt": "2024-08-06T17:47:54.318Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "66b261ca41f0cc371a6407bd",
+                    "name": "pdf4",
+                    "parentFolder": "66b2615a41f0cc371a6407aa",
+                    "mimeType": "application/pdf",
+                    "size": 51745,
+                    "path": "mailmehtabsingh@gmail.com-Mehtab Singh\\\\Root\\\\pdf4.pdf",
+                    "storageLocation": "E:\\Work Related\\Professional Work\\0_College_File_System\\Backend\\TeacherFolders\\mailmehtabsingh@gmail.com-Mehtab Singh\\Root\\pdf4.pdf",
+                    "owner": "66b2615a41f0cc371a6407a8",
+                    "createdAt": "2024-08-06T17:47:54.362Z",
+                    "updatedAt": "2024-08-06T17:47:54.362Z",
+                    "__v": 0
+                }
+            ]
+        }
+    ]
+}

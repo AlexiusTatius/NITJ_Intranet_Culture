@@ -4,6 +4,7 @@ import { isValidObjectId } from 'mongoose';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { unlink } from 'fs/promises';
+import { rename } from 'fs';
 import path from 'path';
 import { TeacherFolderDir } from '../../config.js';
 
@@ -56,6 +57,7 @@ const uploadFile = async (req, res) => {
           // Duplicate file detected
           // await unlink(file.path); // Delete the uploaded file
           return res.status(409).json({
+            succuess: false,
             error: 'Duplicate file',
             message: `A file with the name "${file.originalname}" already exists in this folder.`
           });
@@ -67,6 +69,7 @@ const uploadFile = async (req, res) => {
     }
     
     res.status(201).json({
+      success: true,
       message: 'Files uploaded successfully',
       files: uploadedFiles
     });
@@ -185,4 +188,101 @@ const downloadFile = async (req, res) => {
   }
 };
 
-export {uploadFile, deleteFile, downloadFile};
+const getPdfFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const userObject = req.user;
+    const userId = userObject._id;
+
+    if (!isValidObjectId(fileId)) {
+      return res.status(400).json({ error: 'Invalid file ID' });
+    }
+
+    const file = await FileModel.findOne({ _id: fileId, owner: userId });
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    if (file.mimeType !== 'application/pdf') {
+      return res.status(400).json({ error: 'File is not a PDF' });
+    }
+
+    const absoluteFilePath = path.join(TeacherFolderDir, file.path);
+    const fileStat = await stat(absoluteFilePath);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', fileStat.size);
+
+    const fileStream = createReadStream(absoluteFilePath);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (error) => {
+      console.error('Error streaming file:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Error streaming file' });
+      }
+    });
+
+    file.updatedAt = new Date();
+    await file.save();
+
+  } catch (error) {
+    console.error('Error fetching PDF file:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'An error occurred while fetching the PDF file' });
+    }
+  }
+};
+
+const renameFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { newName } = req.body;
+    const userObject = req.user;
+    const userId = userObject._id;
+
+    if (!isValidObjectId(fileId)) {
+      return res.status(400).json({ error: 'Invalid file ID' });
+    }
+
+    const file = await FileModel.findOne({ _id: fileId, owner: userId });
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const oldPath = path.join(TeacherFolderDir, file.path);
+    const newPath = path.join(path.dirname(oldPath), `${newName}${path.extname(file.path)}`);
+
+    // Check if a file with the new name already exists
+    const existingFile = await FileModel.findOne({
+      owner: userId,
+      parentFolder: file.parentFolder,
+      name: newName
+    });
+
+    if (existingFile) {
+      return res.status(409).json({ error: 'A file with this name already exists in the same location' });
+    }
+
+    // Rename the physical file
+    rename(oldPath, newPath, async (err) => {
+      if (err) {
+        console.error('Error renaming file:', err);
+        return res.status(500).json({ error: 'An error occurred while renaming the file' });
+      }
+
+      // Update the file document in the database
+      file.name = newName;
+      file.path = path.join(path.dirname(file.path), `${newName}${path.extname(file.path)}`).replace(/\\/g, '\\\\');
+      file.updatedAt = new Date();
+      await file.save();
+
+      res.status(200).json({ message: 'File renamed successfully', file });
+    });
+  } catch (error) {
+    console.error('Error renaming file:', error);
+    res.status(500).json({ error: 'An error occurred while renaming the file' });
+  }
+};
+
+export {uploadFile, deleteFile, downloadFile, getPdfFile, renameFile};
