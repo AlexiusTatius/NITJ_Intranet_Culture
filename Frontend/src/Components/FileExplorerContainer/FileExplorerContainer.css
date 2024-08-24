@@ -4,7 +4,7 @@
 
 @layer components {
   .file-explorer-container {
-    @apply w-full max-w-[45%] mx-auto bg-white rounded-lg shadow-lg overflow-hidden;
+    @apply w-full max-w-[100%] mx-auto bg-white rounded-lg shadow-lg overflow-hidden;
     z-index: 1;
   }
 

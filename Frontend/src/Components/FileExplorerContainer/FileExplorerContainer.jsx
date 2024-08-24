@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import FolderComponent from '../FolderPlaceholder/FolderComponent';
 import FileComponent from '../FilePlaceholder/FileComponent';
 import './FileExplorerContainer.css';
-import { Search, FolderPlus, Upload, ChevronLeft } from 'lucide-react';
+import { Search, FolderPlus, Upload, ChevronLeft, Loader } from 'lucide-react';
 
 const FileExplorerContainer = () => {
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -130,18 +131,38 @@ const FileExplorerContainer = () => {
   const handleFileClick = (fileId) => {
     navigate(`/pdf-viewer/${fileId}`);
   };
+  
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+  };
 
   return (
-    <div className="file-explorer-container">
+    <motion.div 
+      className="file-explorer-container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="file-explorer-header">
         <div className="flex items-center">
           {currentFolder && currentFolder.parentFolder && (
-            <button onClick={handleBackClick} className="back-button mr-3">
+            <motion.button 
+              onClick={handleBackClick} 
+              className="back-button mr-3"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <ChevronLeft size={16} className="inline mr-1" />
               Back
-            </button>
+            </motion.button>
           )}
-          <h2 className="folder-name">{currentFolder ? currentFolder.name : 'Root'}</h2>
+          <h2 className="folder-name text-2xl">{currentFolder ? currentFolder.name : 'Root'}</h2>
         </div>
         <div className="search-container">
           <Search className="search-icon" size={18} />
@@ -155,15 +176,24 @@ const FileExplorerContainer = () => {
         </div>
       </div>
       <div className="file-explorer-actions">
-        <button onClick={handleCreateFolder} className="create-folder-button">
+        <motion.button 
+          onClick={handleCreateFolder} 
+          className="create-folder-button"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <FolderPlus size={18} className="inline mr-2" />
-            Create Folder
-        </button>
+          Create Folder
+        </motion.button>
         <div className="file-upload-container">
-          <button className="file-upload-button">
+          <motion.button 
+            className="file-upload-button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <Upload size={18} className="inline mr-2" />
             Upload Files
-          </button>
+          </motion.button>
           <input 
             type="file" 
             onChange={handleFileUpload} 
@@ -175,30 +205,41 @@ const FileExplorerContainer = () => {
       </div>
       <div className="file-explorer-content">
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-64">
+            <Loader className="animate-spin text-blue-500" size={48} />
+          </div>
         ) : error ? (
-          <p>{error}</p>
+          <p className="text-red-500 text-center">{error}</p>
         ) : (
-          filteredContents.map(item => (
-            item.type === 'folder' ? (
-              <FolderComponent 
-                key={item._id} 
-                folder={item} 
-                onFolderClick={() => handleFolderClick(item._id)}
-                onFolderUpdate={() => fetchFolderContents(currentFolder._id)}
-              />
-            ) : (
-              <FileComponent 
-                key={item._id} 
-                file={item}
-                onFileUpdate={() => fetchFolderContents(currentFolder._id)}
-                onFileClick={() => handleFileClick(item._id)}
-              />
-            )
-          ))
+          <AnimatePresence>
+            {filteredContents.map(item => (
+              <motion.div
+                key={item._id}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                layout
+              >
+                {item.type === 'folder' ? (
+                  <FolderComponent 
+                    folder={item} 
+                    onFolderClick={() => handleFolderClick(item._id)}
+                    onFolderUpdate={() => fetchFolderContents(currentFolder._id)}
+                  />
+                ) : (
+                  <FileComponent 
+                    file={item}
+                    onFileUpdate={() => fetchFolderContents(currentFolder._id)}
+                    onFileClick={() => handleFileClick(item._id)}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

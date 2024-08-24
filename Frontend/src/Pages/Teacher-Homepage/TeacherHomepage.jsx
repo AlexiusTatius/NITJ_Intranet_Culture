@@ -4,7 +4,7 @@ import FileExplorerContainer from '../../Components/FileExplorerContainer/FileEx
 
 const TeacherHomepage = () => {
   return (
-    <div className="file-explorer-page">
+    <div className="file-explorer-page w-full">
       <header className="page-header">
         <h1>All Files</h1>
       </header>

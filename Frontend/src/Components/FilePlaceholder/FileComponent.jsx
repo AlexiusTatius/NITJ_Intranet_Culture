@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
+import axiosInstance from '../../Helper/axiosInstance';
 
 const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
   const handleRename = async (newName) => {
@@ -8,15 +9,9 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
 
     try {
       const token = localStorage.getItem('auth-token');
-      const response = await axios.put(
-        `http://localhost:8001/api/user/Teacher/file-folder/renameFile/${file._id}`,
-        { newName },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
+      const response = await axiosInstance.put(
+        `/Teacher/file-folder/renameFile/${file._id}`,
+        { newName }
       );
 
       if (response.data.message) {

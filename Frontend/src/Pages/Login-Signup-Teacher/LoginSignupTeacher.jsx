@@ -1,116 +1,122 @@
 import axios from 'axios';
 import React, { useState } from "react";  
-import {Link } from "react-router-dom";
-import "./LoginSignupTeacher.css";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
-// check your requests on http dump
 const LoginSignupTeacher = () => {
-
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({username:"", email:"", password:""});
-
 
   const changeHandler = (event) => {
     setFormData(prevFormData => ({
         ...prevFormData,
         [event.target.name]: event.target.value
     }));
-}
+  }
 
   const toggleState = () => {
     setState(prevState => prevState === "Login" ? "Sign Up" : "Login");
-}
-
-
-const login = async () => {
-  try {
-    const response = await axios.post('http://localhost:8001/api/user/Teacher/login', formData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const dataObj = response.data;
-    console.log("Login: ",dataObj);
-    if (dataObj.success) {
-      localStorage.setItem('auth-token', dataObj.token);
-      // window.location.replace('/');   // Must not redirect to home page after signup
-    } else {
-      alert(dataObj.errors);
-    }
-  } catch (error) {
-    if (error.response) {
-      // Server responded with a status other than 2xx
-      console.error('Error response:', error.response.data);
-      alert(error.response.data.message || 'An error occurred during login. Please try again.');
-    } else {
-      // Something else happened while setting up the request
-      console.error('Error logging in:', error.message);
-      alert('An error occurred during login. Please try again.');
-    }
   }
-};
 
-  const signup = async () => {
-    console.log("Signup: ",formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8001/api/user/Teacher/register', 
-        formData, 
-        {
-        headers: {
-            'Content-Type': 'application/json',
-          },
+      const endpoint = state === "Login" ? 'login' : 'register';
+      const response = await axios.post(`http://localhost:8001/api/user/Teacher/${endpoint}`, formData, {
+        headers: { 'Content-Type': 'application/json' },
       });
-      const dataObj = response.data;
-      console.log("response: ",dataObj);
 
+      const dataObj = response.data;
       if (dataObj.success) {
         localStorage.setItem('auth-token', dataObj.token);
-        // window.location.replace('/');   // Must not redirect to home page after signup
+        // Handle successful login/signup
       } else {
-        alert(dataObj.errors);
+        alert(dataObj.errors || 'An error occurred. Please try again.');
       }
     } catch (error) {
-      if (error.response) {
-        // Server responded with a status other than 2xx
-        console.error('Error response:', error.response.data);
-        alert(error.response.data.message || 'An error occurred during signup. Please try again.');
-      } else {
-        // Something else happened while setting up the request
-        console.error('Error signing up:', error.message);
-        alert('An error occurred during signup. Please try again.');
-      } 
+      console.error(`Error during ${state.toLowerCase()}:`, error);
+      alert(error.response?.data?.message || `An error occurred. Please try again.`);
     }
   };
 
-
   return (
-    <div className="loginsignup">
-      <div className="loginsignup-container">
-        <h1>{state}</h1>
-        <div className="loginsignup-fields">
-          {state==="Sign Up"?
-          <input type="text" placeholder="Your name" name="username" value={formData.username} onChange={changeHandler}/>
-          :<></>}
-          <input type="email" placeholder="Email address" name="email" value={formData.email} onChange={changeHandler}/>
-          <input type="password" placeholder="Password" name="password" value={formData.password} onChange={changeHandler}/>
+    <div className="w-full min-h-screen bg-gradient-to-br from-green-100 to-blue-100 py-16 px-4 flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+      >
+        <div className="px-8 py-6 bg-blue-600">
+          <h1 className="text-3xl font-bold text-white text-center">{state}</h1>
         </div>
-
-        <button onClick={()=>{state==="Login"?login():signup()}}>Continue</button>
-
-        {state==="Login"?
-          <div>
-           <p className="loginsignup-login">Create an account? <span onClick={toggleState}>SignUp here</span></p>   {/* // Here the state changes so component re-renders */}
-           <p className="loginsignup-forgot">Forgot your Password? <Link to="/user/ForgotPassword"><span>Forgot Password</span></Link></p>
+        <form onSubmit={handleSubmit} className="px-8 py-6 space-y-6">
+          {state === "Sign Up" && (
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium text-gray-700">Username</label>
+              <input 
+                type="text" 
+                id="username"
+                placeholder="Your name" 
+                name="username" 
+                value={formData.username} 
+                onChange={changeHandler}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              />
+            </div>
+          )}
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
+            <input 
+              type="email" 
+              id="email"
+              placeholder="Email address" 
+              name="email" 
+              value={formData.email} 
+              onChange={changeHandler}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+            />
           </div>
-        :<p className="loginsignup-login">Already have an account? <span onClick={toggleState}>LogIn here</span></p>}
-
-      </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
+            <input 
+              type="password" 
+              id="password"
+              placeholder="Password" 
+              name="password" 
+              value={formData.password} 
+              onChange={changeHandler}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+            />
+          </div>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
+          >
+            Continue
+          </motion.button>
+        </form>
+        <div className="px-8 py-4 bg-gray-50 border-t border-gray-200">
+          {state === "Login" ? (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                Don't have an account? <span onClick={toggleState} className="text-blue-600 cursor-pointer hover:underline font-medium">Sign Up here</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Forgot your Password? <Link to="/user/ForgotPassword" className="text-blue-600 hover:underline font-medium">Reset Password</Link>
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-600">
+              Already have an account? <span onClick={toggleState} className="text-blue-600 cursor-pointer hover:underline font-medium">Log In here</span>
+            </p>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };
 
 export default LoginSignupTeacher;
-
-
-// What is the purpose of formData and setFormData in the above code?
