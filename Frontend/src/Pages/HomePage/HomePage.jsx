@@ -1,12 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, UserPlus } from 'lucide-react';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   const buttonVariants = {
     hover: { scale: 1.05 },
     tap: { scale: 0.95 }
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
   return (
@@ -22,29 +28,27 @@ const HomePage = () => {
         </div>
         <div className="p-8">
           <p className="text-center text-gray-600 mb-8">Please select your role to continue:</p>
-          <div className="space-y-40"> {/* Increased space-y from 6 to 8 */}
-            <Link to="/Teacher/loginSignup">
-              <motion.button 
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                className="w-full flex items-center justify-center bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-lg font-medium"
-              >
-                <User className="mr-2" size={24} />
-                Teacher
-              </motion.button>
-            </Link>
-            <Link to="/Student/loginSignup">
-              <motion.button 
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                className="w-full flex items-center justify-center bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 text-lg font-medium"
-              >
-                <UserPlus className="mr-2" size={24} />
-                Student
-              </motion.button>
-            </Link>
+          <div className="space-y-8">
+            <motion.button 
+              onClick={() => handleNavigation('/Teacher/loginSignup')}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="w-full flex items-center justify-center bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-lg font-medium"
+            >
+              <User className="mr-2" size={24} />
+              Teacher
+            </motion.button>
+            <motion.button 
+              onClick={() => handleNavigation('/Student/loginSignup')}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="w-full flex items-center justify-center bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 text-lg font-medium"
+            >
+              <UserPlus className="mr-2" size={24} />
+              Student
+            </motion.button>
           </div>
         </div>
       </motion.div>
@@ -53,3 +57,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+
