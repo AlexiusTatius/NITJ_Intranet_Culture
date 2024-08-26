@@ -55,21 +55,22 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
     <div className="file-component" onClick={() => onFileClick(file._id)}>
       <img src="/Pdf.svg" alt={file.mimeType} className="file-icon" />
       <span className="file-name">{file.name}</span>
-      <span className="file-info">
-        {(file.size / 1024).toFixed(2)} KB | Last modified: {new Date(file.updatedAt).toLocaleDateString()}
+      <span className="file-info">{(file.size / 1024).toFixed(2)} KB</span>
+      <span className="file-info hidden md:inline-block" >
+        | Last modified: {new Date(file.updatedAt).toLocaleDateString()}
       </span>
       <ThreeDotsMenu
         options={[
           {
-            label: 'Rename',
+            label: "Rename",
             action: () => {
-              const newName = prompt('Enter new file name:', file.name);
+              const newName = prompt("Enter new file name:", file.name);
               if (newName) handleRename(newName);
-            }
+            },
           },
           {
-            label: 'Delete',
-            action: handleDelete
+            label: "Delete",
+            action: handleDelete,
           },
         ]}
       />
