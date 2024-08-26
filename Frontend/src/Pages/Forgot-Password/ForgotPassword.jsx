@@ -2,13 +2,12 @@ import axios from 'axios';
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, RefreshCw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
 
     const changeEmail = (event) => {
         setEmail(event.target.value);
@@ -44,10 +43,6 @@ const ForgotPassword = () => {
             setIsLoading(false);
         }
     }
-
-    const handleNavigation = (path) => {
-        navigate(path);
-    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-cyan-100 to-blue-200 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -117,13 +112,13 @@ const ForgotPassword = () => {
                 )}
 
                 <div className="mt-6">
-                    <span
-                        onClick={() => handleNavigation('/')}
-                        className="flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out cursor-pointer"
+                    <Link
+                        to="/"
+                        className="flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Login
-                    </span>
+                    </Link>
                 </div>
             </motion.div>
         </div>
