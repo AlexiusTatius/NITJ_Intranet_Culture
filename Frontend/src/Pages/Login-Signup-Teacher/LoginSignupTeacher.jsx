@@ -1,11 +1,12 @@
 import axios from 'axios';
 import React, { useState } from "react";  
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const LoginSignupTeacher = () => {
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({username:"", email:"", password:""});
+  const navigate = useNavigate();
 
   const changeHandler = (event) => {
     setFormData(prevFormData => ({
@@ -37,6 +38,10 @@ const LoginSignupTeacher = () => {
       console.error(`Error during ${state.toLowerCase()}:`, error);
       alert(error.response?.data?.message || `An error occurred. Please try again.`);
     }
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
   return (
@@ -105,7 +110,7 @@ const LoginSignupTeacher = () => {
                 Don't have an account? <span onClick={toggleState} className="text-blue-600 cursor-pointer hover:underline font-medium">Sign Up here</span>
               </p>
               <p className="text-sm text-gray-600">
-                Forgot your Password? <Link to="/user/ForgotPassword" className="text-blue-600 hover:underline font-medium">Reset Password</Link>
+                Forgot your Password? <span onClick={() => handleNavigation('/user/ForgotPassword')} className="text-blue-600 cursor-pointer hover:underline font-medium">Reset Password</span>
               </p>
             </div>
           ) : (
