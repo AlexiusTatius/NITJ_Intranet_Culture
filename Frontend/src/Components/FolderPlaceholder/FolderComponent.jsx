@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
-import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots'
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Import styles for react-toastify
+import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
 
 const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
   const handleRename = async (newName) => {
@@ -22,11 +24,11 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
       if (response.data.message) {
         onFolderUpdate();
       } else {
-        alert('Failed to rename folder');
+        toast.error('Failed to rename folder');
       }
     } catch (error) {
       console.error('Error renaming folder:', error);
-      alert(error.response?.data?.error || 'An error occurred while renaming the folder');
+      toast.error(error.response?.data?.error || 'An error occurred while renaming the folder');
     }
   };
 
@@ -49,7 +51,7 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
       if (response.data.message) {
         onFolderUpdate();
       } else {
-        alert('Failed to delete folder');
+        toast.error('Failed to delete folder');
       }
     } catch (error) {
       console.error('Error deleting folder:', error);
@@ -59,10 +61,11 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
           handleDelete();
         }
       } else {
-        alert(error.response?.data?.error || 'An error occurred while deleting the folder');
+        toast.error(error.response?.data?.error || 'An error occurred while deleting the folder');
       }
     }
   };
+
   const handleThreeDotsClick = (event) => {
     event.stopPropagation(); // Stop the click event from propagating to the parent
   };
@@ -73,20 +76,17 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
       <span className="folder-name">{folder.name}</span>
       <div onClick={handleThreeDotsClick}>
         <ThreeDotsMenu
-          options=
-          {
-            [
-              {
-                label: 'Rename', action: () => {
-                  const newName = prompt('Enter new folder name:', folder.name);
-                  if (newName) handleRename(newName);
-                }
-              },
-              {
-                label: 'Delete', action: handleDelete
-              },
-            ]
-          }
+          options={[
+            {
+              label: 'Rename', action: () => {
+                const newName = prompt('Enter new folder name:', folder.name);
+                if (newName) handleRename(newName);
+              }
+            },
+            {
+              label: 'Delete', action: handleDelete
+            },
+          ]}
         />
       </div>
     </div>

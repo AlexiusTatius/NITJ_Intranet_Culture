@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
 import axiosInstance from '../../Helper/axiosInstance';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
   const handleRename = async (newName) => {
@@ -16,12 +18,13 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
 
       if (response.data.message) {
         onFileUpdate();
+        toast.success('File renamed successfully!');
       } else {
-        alert('Failed to rename file');
+        toast.error('Failed to rename file');
       }
     } catch (error) {
       console.error('Error renaming file:', error);
-      alert(error.response?.data?.error || 'An error occurred while renaming the file');
+      toast.error(error.response?.data?.error || 'An error occurred while renaming the file');
     }
   };
 
@@ -42,12 +45,13 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
 
       if (response.data.message) {
         onFileUpdate();
+        toast.success('File deleted successfully!');
       } else {
-        alert('Failed to delete file');
+        toast.error('Failed to delete file');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
-      alert(error.response?.data?.error || 'An error occurred while deleting the file');
+      toast.error(error.response?.data?.error || 'An error occurred while deleting the file');
     }
   };
 
