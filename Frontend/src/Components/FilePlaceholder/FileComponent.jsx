@@ -1,5 +1,7 @@
 import React from 'react';
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {apiTeacherInstance} from '../../Helper/axiosInstance';
 
 const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
@@ -13,12 +15,13 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
 
       if (response.data.message) {
         onFileUpdate();
+        toast.success('File renamed successfully!');
       } else {
-        alert('Failed to rename file');
+        toast.error('Failed to rename file');
       }
     } catch (error) {
       console.error('Error renaming file:', error);
-      alert(error.response?.data?.error || 'An error occurred while renaming the file');
+      toast.error(error.response?.data?.error || 'An error occurred while renaming the file');
     }
   };
 
@@ -30,12 +33,13 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
       const response = await apiTeacherInstance.delete(`/file-folder/deleteFile/${file._id}`,);
       if (response.data.message) {
         onFileUpdate();
+        toast.success('File deleted successfully!');
       } else {
-        alert('Failed to delete file');
+        toast.error('Failed to delete file');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
-      alert(error.response?.data?.error || 'An error occurred while deleting the file');
+      toast.error(error.response?.data?.error || 'An error occurred while deleting the file');
     }
   };
 

@@ -6,6 +6,8 @@ import FileComponent from '../FilePlaceholder/FileComponent';
 import './FileExplorerContainer.css';
 import { apiTeacherInstance } from '../../Helper/axiosInstance';
 import { Search, FolderPlus, Upload, ChevronLeft, Loader } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FileExplorerContainer = () => {
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -69,13 +71,13 @@ const FileExplorerContainer = () => {
 
       if (response.data._id) {
         fetchFolderContents(currentFolder._id);
-        alert('Folder created successfully');
+        toast.success('Folder created successfully');
       } else {
-        alert('Failed to create folder');
+        toast.error('Failed to create folder');
       }
     } catch (error) {
       console.error('Error creating folder:', error);
-      alert(error.response?.data?.error || 'An error occurred while creating the folder');
+      toast.error(error.response?.data?.error || 'An error occurred while creating the folder');
     }
   };
   
@@ -97,13 +99,13 @@ const FileExplorerContainer = () => {
 
       if (response.data.success) {
         fetchFolderContents(currentFolder._id);
-        alert(response.data.message || 'Files uploaded successfully');
+        toast.success(response.data.message || 'Files uploaded successfully');
       } else {
-        alert(response.data.message || response.data.error || 'Failed to upload files');
+        toast.error(response.data.message || response.data.error || 'Failed to upload files');
       }
     } catch (error) {
       console.error('Error uploading files:', error);
-      alert(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
+      toast.error(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
     }
   };
 
