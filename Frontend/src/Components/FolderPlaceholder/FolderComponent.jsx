@@ -1,24 +1,17 @@
 import React from 'react';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Import styles for react-toastify
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
+import { apiTeacherInstance } from '../../Helper/axiosInstance';
 
 const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
   const handleRename = async (newName) => {
     if (!newName) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.put(
-        `http://localhost:8001/api/user/Teacher/file-folder/renameFolder/${folder._id}`,
+      const response = await apiTeacherInstance.put(
+        `/file-folder/renameFolder/${folder._id}`,
         { newName },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
       );
 
       if (response.data.message) {
@@ -37,13 +30,9 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.delete(
-        `http://localhost:8001/api/user/Teacher/file-folder/deleteFolder/${folder._id}`,
+      const response = await apiTeacherInstance.delete(
+        `/file-folder/deleteFolder/${folder._id}`,
         {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
           data: { confirmDelete: true },
         }
       );

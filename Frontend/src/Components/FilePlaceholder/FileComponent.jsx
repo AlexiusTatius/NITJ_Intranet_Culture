@@ -1,18 +1,15 @@
 import React from 'react';
-import axios from 'axios';
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
-import axiosInstance from '../../Helper/axiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {apiTeacherInstance} from '../../Helper/axiosInstance';
 
 const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
   const handleRename = async (newName) => {
     if (!newName) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axiosInstance.put(
-        `/Teacher/file-folder/renameFile/${file._id}`,
+      const response = await apiTeacherInstance.put(`/file-folder/renameFile/${file._id}`,
         { newName }
       );
 
@@ -33,16 +30,7 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.delete(
-        `http://localhost:8001/api/user/Teacher/file-folder/deleteFile/${file._id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await apiTeacherInstance.delete(`/file-folder/deleteFile/${file._id}`,);
       if (response.data.message) {
         onFileUpdate();
         toast.success('File deleted successfully!');
