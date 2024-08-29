@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState } from "react";  
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -23,9 +22,7 @@ const LoginSignupTeacher = () => {
     e.preventDefault();
     try {
       const endpoint = state === "Login" ? 'login' : 'register';
-      const response = await axios.post(`http://localhost:8001/api/user/Teacher/${endpoint}`, formData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await apiTeacherInstance.post(`/${endpoint}`, formData);
 
       const dataObj = response.data;
       if (dataObj.success) {

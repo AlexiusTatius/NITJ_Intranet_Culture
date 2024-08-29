@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { useState } from "react";  
 import "./LoginSignupStudent.css";
+import { apiStudentInstance } from '../../Helper/axiosInstance';
 
 // check your requests on http dump
 const LoginSignupStudent = () => {
@@ -23,12 +23,7 @@ const LoginSignupStudent = () => {
 
 const login = async () => {
   try {
-    const response = await axios.post('http://localhost:8001/api/user/Student/login', formData, {
-      headers: {
-        'Content-Type': 'application/json', 
-      },
-    });
-
+    const response = await apiStudentInstance.post('/login', formData);
     const dataObj = response.data;
     console.log("Login: ",dataObj);
     if (dataObj.success) {
@@ -53,13 +48,7 @@ const login = async () => {
   const signup = async () => {
     console.log("Signup: ",formData);
     try {
-      const response = await axios.post('http://localhost:8001/api/user/Student/register', 
-        formData, 
-        {
-        headers: {
-            'Content-Type': 'application/json',
-          },
-      });
+      const response = await apiStudentInstance.post('/register', formData);
       const dataObj = response.data;
       if (dataObj.success) {
         localStorage.setItem('auth-token', dataObj.token);
