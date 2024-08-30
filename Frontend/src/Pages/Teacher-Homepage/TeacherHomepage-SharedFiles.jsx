@@ -1,12 +1,22 @@
 import React from 'react';
 import './TeacherHomepage.css';
 import SharedFileExplorerContainer from '../../Components/SharedExplorerContainer/SharedFilesExplorerContainer';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const TeacherHomepageSharedFiles = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="file-explorer-page w-full">
       <header className="page-header">
-        <h1>Shared Files</h1>
+        <div className='flex justify-between items-center w-[100vw]'>
+          <div><h1 className="mr-auto text-left">Shared Files</h1></div>
+          <div>          <button className="bg-green-500 text-white px-4 py-2 rounded ml-4 mr-5" onClick={() => navigate('/Teacher/Homepage/allfiles')}>
+            All Files
+          </button></div>
+          
+
+        </div>
       </header>
       <main className="page-content">
         <SharedFileExplorerContainer />
