@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FolderComponent from '../FolderPlaceholder/FolderComponent';
 import FileComponent from '../FilePlaceholder/FileComponent';
 import './FileExplorerContainer.css';
+import { apiTeacherInstance } from '../../Helper/axiosInstance';
 import { Search, FolderPlus, Upload, ChevronLeft, Loader } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FileExplorerContainer = () => {
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -22,12 +24,7 @@ const FileExplorerContainer = () => {
   const fetchFolderContents = async (folderId) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('auth-token'); // Assuming you store the JWT in localStorage
-      const response = await axios.get(`http://localhost:8001/api/user/Teacher/file-folder/folderStructure/${folderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await apiTeacherInstance.get(`/file-folder/folderStructure/${folderId}`);
       const data = response.data;
       setContents([
         ...data.folderStructure.children.map(folder => ({ ...folder, type: 'folder' })),
@@ -58,7 +55,7 @@ const FileExplorerContainer = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredContents = contents.filter(item => 
+  const filteredContents = contents.filter(item =>  
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -67,33 +64,23 @@ const FileExplorerContainer = () => {
     if (!folderName) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.post(
-        'http://localhost:8001/api/user/Teacher/file-folder/createFolder',
-        {
-          name: folderName,
-          parentFolderId: currentFolder._id,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await apiTeacherInstance.post('/file-folder/createFolder', {
+        name: folderName,
+        parentFolderId: currentFolder._id,
+      });
 
       if (response.data._id) {
         fetchFolderContents(currentFolder._id);
-        alert('Folder created successfully');
+        toast.success('Folder created successfully');
       } else {
-        alert('Failed to create folder');
+        toast.error('Failed to create folder');
       }
     } catch (error) {
       console.error('Error creating folder:', error);
-      alert(error.response?.data?.error || 'An error occurred while creating the folder');
+      toast.error(error.response?.data?.error || 'An error occurred while creating the folder');
     }
   };
-
+  
   const handleFileUpload = async (event) => {
     const files = event.target.files;
     if (files.length === 0) return;
@@ -104,27 +91,21 @@ const FileExplorerContainer = () => {
     }
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.post(
-        `http://localhost:8001/api/user/Teacher/file-folder/uploadFile/${currentFolder._id}`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await apiTeacherInstance.post(`/file-folder/uploadFile/${currentFolder._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Override for file upload, the default is application/json which is defined in axiosInstance.js
+        },
+      });
 
       if (response.data.success) {
         fetchFolderContents(currentFolder._id);
-        alert(response.data.message || 'Files uploaded successfully');
+        toast.success(response.data.message || 'Files uploaded successfully');
       } else {
-        alert(response.data.message || response.data.error || 'Failed to upload files');
+        toast.error(response.data.message || response.data.error || 'Failed to upload files');
       }
     } catch (error) {
       console.error('Error uploading files:', error);
-      alert(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
+      toast.error(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
     }
   };
 

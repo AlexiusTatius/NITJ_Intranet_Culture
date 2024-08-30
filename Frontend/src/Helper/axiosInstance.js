@@ -1,37 +1,29 @@
 import axios from 'axios';
 
-// Create an Axios instance
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8001/api/user', // Replace with your API base URL
-  timeout: 1000, // Optional: specify a timeout
-  headers: { 'Content-Type': 'application/json' } // Optional: specify default headers
+const apiTeacherInstance = axios.create({
+  baseURL: 'http://localhost:8001/api/user/Teacher',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Optional: Add request and response interceptors
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // You can modify the request config here
-    // For example, adding an authentication token
-    const token = localStorage.getItem('token'); // Assuming token is stored in local storage
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+const apiStudentInstance = axios.create({
+  baseURL: 'http://localhost:8001/api/user/Student',
+  headers: {
+    'Content-Type': 'application/json',
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+});
 
-axiosInstance.interceptors.response.use(
-  (response) => {
-    // Handle the response data
-    return response;
-  },
-  (error) => {
-    // Handle errors
-    return Promise.reject(error);
+const addAuthToken = (config) => {
+  const token = localStorage.getItem('auth-token'); // Assuming you store the token in localStorage
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
-);
+  return config;
+};
+// Add a request interceptor to include the token in every request
 
-export default axiosInstance;
+apiTeacherInstance.interceptors.request.use(addAuthToken, (error) => Promise.reject(error));
+apiStudentInstance.interceptors.request.use(addAuthToken, (error) => Promise.reject(error));
+
+export { apiTeacherInstance, apiStudentInstance };

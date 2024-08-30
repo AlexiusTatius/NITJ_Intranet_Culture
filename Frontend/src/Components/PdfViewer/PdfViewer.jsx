@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { apiTeacherInstance } from '../../Helper/axiosInstance';
 
 const PdfViewer = () => {
   const { fileId } = useParams();
@@ -10,13 +10,9 @@ const PdfViewer = () => {
   useEffect(() => {
     const fetchPdf = async () => {
       try {
-        const token = localStorage.getItem('auth-token');
-        const response = await axios.get(
-          `http://localhost:8001/api/user/Teacher/file-folder/getPdfFile/${fileId}`,
+        const response = await apiTeacherInstance.get(
+          `/file-folder/getPdfFile/${fileId}`,
           {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
             responseType: 'blob',
           }
         );
