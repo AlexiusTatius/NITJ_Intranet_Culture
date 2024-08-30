@@ -5,8 +5,9 @@ import LoginSignupStudent from './Pages/Login-Signup-Student/LoginSignupStudent'
 import HomePage from './Pages/HomePage/HomePage'
 import ForgotPassword from './Pages/Forgot-Password/ForgotPassword'
 import ResetPassword from './Pages/Reset-Password/ResetPassword'
-import TeacherHomepage from "./Pages/Teacher-Homepage/TeacherHomepage"
 import PdfViewerPage from "./Pages/PdfViewerPage/PdfViewerPage"
+import TeacherHomepageAllFiles from "./Pages/Teacher-Homepage/TeacherHomepage-AllFiles"
+import TeacherHomepageSharedFiles from "./Pages/Teacher-Homepage/TeacherHomepage-SharedFiles"
 import { Toaster } from 'react-hot-toast'
 import { Fragment } from "react"
 
@@ -23,7 +24,8 @@ function App() {
         <Route path="/user/ForgotPassword" element={<ForgotPassword />} />
         <Route path="/Student/loginSignup" element={<LoginSignupStudent />} />
         <Route path="/user/ResetPassword" element={<ResetPassword />} />
-        <Route path="/Teacher/HomePage" element={<TeacherHomepage />} />
+        <Route path="/Teacher/HomePage/AllFiles" element={<TeacherHomepageAllFiles />} />
+        <Route path="/Teacher/HomePage/SharedFiles" element={<TeacherHomepageSharedFiles />} />
         <Route path="/pdf-viewer/:fileId" element={<PdfViewerPage />} />
       </Routes>
     </Fragment>

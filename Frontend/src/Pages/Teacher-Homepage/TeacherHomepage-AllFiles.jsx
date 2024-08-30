@@ -2,7 +2,7 @@ import React from 'react';
 import './TeacherHomepage.css';
 import FileExplorerContainer from '../../Components/FileExplorerContainer/FileExplorerContainer';
 
-const TeacherHomepage = () => {
+const TeacherHomepageAllFiles = () => {
   return (
     <div className="file-explorer-page w-full">
       <header className="page-header">
@@ -15,4 +15,4 @@ const TeacherHomepage = () => {
   );
 };
 
-export default TeacherHomepage;
+export default TeacherHomepageAllFiles;
