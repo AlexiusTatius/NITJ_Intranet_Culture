@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {apiTeacherInstance} from '../../Helper/axiosInstance';
 
-const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
+const FileComponent = ({ file, onFileUpdate, onFileClick, isShared = false }) => {
   const handleRename = async (newName) => {
     if (!newName) return;
 
@@ -43,15 +43,45 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const response = await apiTeacherInstance.put(`/file-folder/shareFile/${file._id}`);
+      if (response.data.message) {
+        toast.success(`File shared successfully`);
+        onFileUpdate();
+      } else {
+        toast.error(`Failed to share file`);
+      }
+    } catch (error) {
+      console.error(`Error sharing file:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while sharing the file`);
+    }
+  };
+
+  const handleUnshare = async () => {
+    try {
+      const response = await apiTeacherInstance.put(`/file-folder/unshareFile/${file._id}`);
+      if (response.data.message) {
+        toast.success(`File unshared successfully`);
+        onFileUpdate();
+      } else {
+        toast.error(`Failed to unshare ${file.type}`);
+      }
+    } catch (error) {
+      console.error(`Error unsharing ${file.type}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while unsharing the ${file.type}`);
+    }
+  };
+
   return (
-    <div className="file-component" onClick={() => onFileClick(file._id)}>
+    <div className="file-component" onClick={() => onFileClick()}>
       <img src="/Pdf.svg" alt={file.mimeType} className="file-icon" />
       <span className="file-name">{file.name}</span>
       <span className="file-info">{(file.size / 1024).toFixed(2)} KB</span>
       <span className="file-info hidden md:inline-block" >
         | Last modified: {new Date(file.updatedAt).toLocaleDateString()}
       </span>
-      <ThreeDotsMenu
+      {isShared ? (<ThreeDotsMenu
         options={[
           {
             label: "Rename",
@@ -64,8 +94,35 @@ const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
             label: "Delete",
             action: handleDelete,
           },
+          {
+            label: "Share",
+            action: () => handleShare(),
+          }
         ]}
-      />
+      />) :(
+        <ThreeDotsMenu
+          options={[
+            {
+              label: "Rename",
+              action: () => {
+                const newName = prompt("Enter new file name:", file.name);
+                if (newName) handleRename(newName);
+              },
+            },
+            {
+              label: "Delete",
+              action: handleDelete,
+            },
+            {
+              label: "Unshare",
+              action: () => handleUnshare(),
+            }
+          ]}
+        />
+          
+      )
+    }
+
     </div>
   );
 };
