@@ -70,12 +70,14 @@ const registerUser = async (req, res) => {
         const token = createToken(user._id);
 
         // Saving Folder in database
-        const rootFolderPath = path.join(relativeDirPath, 'Root').replace(/\\/g, '\\\\');;
+        const rootFolderPath = path.join(relativeDirPath, 'Root').replace(/\\/g, '\\\\');
+        // root folder should always be shared by default, else none of the inner subfolders could be fetched.
         const rootFolder = new FolderModel({
             name: 'Root',
             parentFolder: null,
             path: rootFolderPath,
-            owner: user._id
+            owner: user._id,
+            isShared: true
         });
         await rootFolder.save();
 

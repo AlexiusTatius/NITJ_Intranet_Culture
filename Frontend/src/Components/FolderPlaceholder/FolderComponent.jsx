@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css'; // Import styles for react-toast
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
 import { apiTeacherInstance } from '../../Helper/axiosInstance';
 
-const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
+const FolderComponent = ({ folder, onFolderClick, onFolderUpdate, isShared = false }) => {
   const handleRename = async (newName) => {
     if (!newName) return;
 
@@ -55,16 +55,46 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const response = await apiTeacherInstance.put(`/file-folder/shareFolder/${folder._id}`);
+      if (response.data.message) {
+        toast.success(`Folder shared successfully`);
+        onFolderUpdate();
+      } else {
+        toast.error(`Failed to share ${folder.name}`);
+      }
+    } catch (error) {
+      console.error(`Error sharing ${folder.name}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while sharing ${folder.name}`);
+    }
+  };
+  
+  const handleUnshare = async () => {
+    try {
+      const response = await apiTeacherInstance.put(`/file-folder/unshareFolder/${folder._id}`);
+      if (response.data.message) {
+        toast.success(`Folder unshared successfully`);
+        onFolderUpdate();
+      } else {
+        toast.error(`Failed to unshare ${folder.name}`);
+      }
+    } catch (error) {
+      console.error(`Error unsharing ${folder.name}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while unsharing the ${folder.name}`);
+    }
+  };
+
   const handleThreeDotsClick = (event) => {
     event.stopPropagation(); // Stop the click event from propagating to the parent
   };
 
   return (
-    <div className="folder-component" onClick={() => onFolderClick(folder._id)}>
+    <div className="folder-component" onClick={() => onFolderClick()}>
       <img src="/Folder.svg" alt="Folder" className="folder-icon" />
       <span className="folder-name">{folder.name}</span>
       <div onClick={handleThreeDotsClick}>
-        <ThreeDotsMenu
+        {isShared ? (<ThreeDotsMenu
           options={[
             {
               label: 'Rename', action: () => {
@@ -75,8 +105,22 @@ const FolderComponent = ({ folder, onFolderClick, onFolderUpdate }) => {
             {
               label: 'Delete', action: handleDelete
             },
+            {
+              label: "Share",
+              action: () => handleShare(),
+            },
           ]}
-        />
+        />):(
+          <ThreeDotsMenu
+            options={[
+              {
+                label: "Unshare",
+                action: () => handleUnshare(),
+              },
+            ]}
+          />
+        )
+        }
       </div>
     </div>
   );
