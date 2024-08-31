@@ -20,7 +20,7 @@ const createFolder = async (req, res) => {
 
     let parentFolder = null;
     let folderPath = name;
-
+    let folderShared = false;
     // Since all the folders will always be created inside the root folder of the user, the parentFolderId
     // can never be null for the rest of the folder except for the root folder.
     if (parentFolderId) {
@@ -36,12 +36,14 @@ const createFolder = async (req, res) => {
     } else{
       return res.status(400).json({ error: 'Folder created outside the root folder is not allowed' });
     }
-
+    parentFolder.isShared === true ? folderShared = true : folderShared = false;
+    
     const newFolder = new FolderModel({
       name,
       parentFolder: parentFolderId,
       path: folderPath,
-      owner: userObject._id
+      owner: userObject._id,
+      isShared: folderShared
     });
 
     // Save the folder to the database
@@ -323,5 +325,7 @@ const getFolderStructure = async (req, res) => {
       res.status(500).json({ error: 'An error occurred while fetching the folder structure' });
   }
 };
+
+
 
 export { createFolder, deleteFolder, renameFolder, getFolderStructure};

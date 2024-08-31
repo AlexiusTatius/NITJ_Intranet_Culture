@@ -44,13 +44,20 @@ const FileSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  isShared: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
 
-// Compound index for efficient querying
+// Compound index for efficient querying of isShared files
 FileSchema.index({ parentFolder: 1, name: 1 }, { unique: true });
+
+// Add index for efficient querying of isShared files
+FileSchema.index({ isShared: 1, owner: 1 });
 
 const FileModel = mongoose.model('File', FileSchema);
 
