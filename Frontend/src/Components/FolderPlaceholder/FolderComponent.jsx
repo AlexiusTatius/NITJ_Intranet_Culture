@@ -1,10 +1,15 @@
-import React from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import styles for react-toastify
-import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
-import { apiTeacherInstance } from '../../Helper/axiosInstance';
+import React from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles for react-toastify
+import ThreeDotsMenu from "../ThreeDotsMenu/ThreeDots";
+import { apiTeacherInstance } from "../../Helper/axiosInstance";
 
-const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = false }) => {
+const FolderComponent = ({
+  AllFolder,
+  SharedFolder,
+  onFolderClick,
+  isShared = false,
+}) => {
   const folderId = AllFolder ? AllFolder._id : SharedFolder._id;
   const folderName = AllFolder ? AllFolder.name : SharedFolder.name;
 
@@ -14,22 +19,27 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
     try {
       const response = await apiTeacherInstance.put(
         `/file-folder/renameFolder/${folderId}`,
-        { newName },
+        { newName }
       );
 
       if (response.data.message) {
         AllFolder.onItemUpdate();
       } else {
-        toast.error('Failed to rename folder');
+        toast.error("Failed to rename folder");
       }
     } catch (error) {
-      console.error('Error renaming folder:', error);
-      toast.error(error.response?.data?.error || 'An error occurred while renaming the folder');
+      console.error("Error renaming folder:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "An error occurred while renaming the folder"
+      );
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the folder "${folderName}"?`);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the folder "${folderName}"?`
+    );
     if (!confirmDelete) return;
 
     try {
@@ -43,17 +53,22 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
       if (response.data.message) {
         AllFolder.onItemUpdate();
       } else {
-        toast.error('Failed to delete folder');
+        toast.error("Failed to delete folder");
       }
     } catch (error) {
-      console.error('Error deleting folder:', error);
+      console.error("Error deleting folder:", error);
       if (error.response?.status === 409) {
-        const confirmForceDelete = window.confirm(error.response.data.message + ' Do you want to delete it anyway?');
+        const confirmForceDelete = window.confirm(
+          error.response.data.message + " Do you want to delete it anyway?"
+        );
         if (confirmForceDelete) {
           handleDelete();
         }
       } else {
-        toast.error(error.response?.data?.error || 'An error occurred while deleting the folder');
+        toast.error(
+          error.response?.data?.error ||
+            "An error occurred while deleting the folder"
+        );
       }
     }
   };
@@ -66,21 +81,37 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
     <div className="folder-component" onClick={() => onFolderClick()}>
       <img src="/Folder.svg" alt="Folder" className="folder-icon" />
       <span className="folder-name">{folderName}</span>
+      {SharedFolder &&
+        (isShared ? (
+          <div className="mr-2">
+            <span className="md:hidden bg-green-100 text-green-900 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+              ✔
+            </span>
+            <span className="hidden md:inline-block bg-green-100 text-green-900 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+              Shared
+            </span>
+          </div>
+        ) : (
+          <></>
+        ))}
       <div onClick={handleThreeDotsClick}>
-        {AllFolder && (
-          isShared ? (
+        {AllFolder &&
+          (isShared ? (
             <ThreeDotsMenu
               options={[
                 {
-                  label: 'Rename',
+                  label: "Rename",
                   action: () => {
-                    const newName = prompt('Enter new folder name:', folderName);
+                    const newName = prompt(
+                      "Enter new folder name:",
+                      folderName
+                    );
                     if (newName) handleRename(newName);
-                  }
+                  },
                 },
                 {
-                  label: 'Delete',
-                  action: handleDelete
+                  label: "Delete",
+                  action: handleDelete,
                 },
                 {
                   label: "Unshare",
@@ -92,15 +123,18 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
             <ThreeDotsMenu
               options={[
                 {
-                  label: 'Rename',
+                  label: "Rename",
                   action: () => {
-                    const newName = prompt('Enter new folder name:', folderName);
+                    const newName = prompt(
+                      "Enter new folder name:",
+                      folderName
+                    );
                     if (newName) handleRename(newName);
-                  }
+                  },
                 },
                 {
-                  label: 'Delete',
-                  action: handleDelete
+                  label: "Delete",
+                  action: handleDelete,
                 },
                 {
                   label: "Share",
@@ -108,22 +142,20 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
                 },
               ]}
             />
-          )
-        )}
-        {SharedFolder && (
-          isShared ? (
+          ))}
+        {SharedFolder &&
+          (isShared ? (
             <ThreeDotsMenu
               options={[
                 {
-                  label: 'Unshare',
+                  label: "Unshare",
                   action: SharedFolder.onItemUnshare,
                 },
               ]}
             />
           ) : (
             <></>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

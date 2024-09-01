@@ -1,10 +1,15 @@
-import React from 'react';
-import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import {apiTeacherInstance} from '../../Helper/axiosInstance';
+import React from "react";
+import ThreeDotsMenu from "../ThreeDotsMenu/ThreeDots";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { apiTeacherInstance } from "../../Helper/axiosInstance";
 
-const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) => {
+const FileComponent = ({
+  AllFile,
+  SharedFile,
+  onFileClick,
+  isShared = false,
+}) => {
   const fileId = AllFile ? AllFile._id : SharedFile._id;
   const fileName = AllFile ? AllFile.name : SharedFile.name;
   const fileMimeType = AllFile ? AllFile.mimeType : SharedFile.mimeType;
@@ -15,37 +20,48 @@ const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) =
     if (!newName) return;
 
     try {
-      const response = await apiTeacherInstance.put(`/file-folder/renameFile/${fileId}`,
+      const response = await apiTeacherInstance.put(
+        `/file-folder/renameFile/${fileId}`,
         { newName }
       );
 
       if (response.data.message) {
         AllFile.onItemUpdate();
-        toast.success('File renamed successfully!');
+        toast.success("File renamed successfully!");
       } else {
-        toast.error('Failed to rename file');
+        toast.error("Failed to rename file");
       }
     } catch (error) {
-      console.error('Error renaming file:', error);
-      toast.error(error.response?.data?.error || 'An error occurred while renaming the file');
+      console.error("Error renaming file:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "An error occurred while renaming the file"
+      );
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the file "${fileName}"?`);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the file "${fileName}"?`
+    );
     if (!confirmDelete) return;
 
     try {
-      const response = await apiTeacherInstance.delete(`/file-folder/deleteFile/${fileId}`,);
+      const response = await apiTeacherInstance.delete(
+        `/file-folder/deleteFile/${fileId}`
+      );
       if (response.data.message) {
         AllFile.onItemUpdate();
-        toast.success('File deleted successfully!');
+        toast.success("File deleted successfully!");
       } else {
-        toast.error('Failed to delete file');
+        toast.error("Failed to delete file");
       }
     } catch (error) {
-      console.error('Error deleting file:', error);
-      toast.error(error.response?.data?.error || 'An error occurred while deleting the file');
+      console.error("Error deleting file:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "An error occurred while deleting the file"
+      );
     }
   };
 
@@ -53,24 +69,37 @@ const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) =
     <div className="file-component" onClick={() => onFileClick()}>
       <img src="/Pdf.svg" alt={fileMimeType} className="file-icon" />
       <span className="file-name">{fileName}</span>
+      {AllFile &&
+        (isShared ? (
+          <>
+            <span className="md:hidden bg-green-100 text-green-900 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+              ✔
+            </span>
+            <span className="hidden md:inline-block bg-green-100 text-green-900 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+              Shared
+            </span>
+          </>
+        ) : (
+          <></>
+        ))}
       <span className="file-info">{(fileSize / 1024).toFixed(2)} KB</span>
-      <span className="file-info hidden md:inline-block" >
+      <span className="file-info hidden md:inline-block">
         | Last modified: {new Date(fileUpdatedAt).toLocaleDateString()}
       </span>
-      {AllFile && (
-        isShared ? (
+      {AllFile &&
+        (isShared ? (
           <ThreeDotsMenu
             options={[
               {
-                label: 'Rename',
+                label: "Rename",
                 action: () => {
-                  const newName = prompt('Enter new file name:', fileName);
+                  const newName = prompt("Enter new file name:", fileName);
                   if (newName) handleRename(newName);
-                }
+                },
               },
               {
-                label: 'Delete',
-                action: handleDelete
+                label: "Delete",
+                action: handleDelete,
               },
               {
                 label: "Unshare",
@@ -82,38 +111,36 @@ const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) =
           <ThreeDotsMenu
             options={[
               {
-                label: 'Rename',
+                label: "Rename",
                 action: () => {
-                  const newName = prompt('Enter new folder name:', fileName);
+                  const newName = prompt("Enter new folder name:", fileName);
                   if (newName) handleRename(newName);
-                }
+                },
               },
               {
-                label: 'Delete',
-                action: handleDelete
+                label: "Delete",
+                action: handleDelete,
               },
               {
                 label: "Share",
                 action: AllFile.onItemShare,
-              }
+              },
             ]}
           />
-        )
-      )}
-      {SharedFile && (
-        isShared ?(
+        ))}
+      {SharedFile &&
+        (isShared ? (
           <ThreeDotsMenu
-          options={[
-            {
-              label: 'Unshare',
-              action: SharedFile.onItemUnshare,
-            }
-          ]}
-        />
+            options={[
+              {
+                label: "Unshare",
+                action: SharedFile.onItemUnshare,
+              },
+            ]}
+          />
         ) : (
-        <></>
-        ) 
-      )}
+          <></>
+        ))}
     </div>
   );
 };
