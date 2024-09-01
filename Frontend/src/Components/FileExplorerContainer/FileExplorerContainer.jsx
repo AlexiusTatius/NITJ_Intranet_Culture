@@ -112,6 +112,38 @@ const FileExplorerContainer = () => {
   const handleFileClick = (fileId) => {
     navigate(`/pdf-viewer/${fileId}`);
   };
+
+  const handleShare = async (item) => {
+    try {
+      const endpoint = item.type === 'folder' ? 'shareFolder' : 'shareFile';
+      const response = await apiTeacherInstance.put(`/file-folder/${endpoint}/${item._id}`);
+      if (response.data.message) {
+        toast.success(`${item.type === 'folder' ? 'Folder' : 'File'} shared successfully`);
+        fetchFolderContents(currentFolder._id);
+      } else {
+        toast.error(`Failed to share ${item.type}`);
+      }
+    } catch (error) {
+      console.error(`Error sharing ${item.type}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while sharing the ${item.type}`);
+    }
+  };
+
+  const handleUnshare = async (item) => {
+    try {
+      const endpoint = item.type === 'folder' ? 'unshareFolder' : 'unshareFile';
+      const response = await apiTeacherInstance.put(`/file-folder/${endpoint}/${item._id}`);
+      if (response.data.message) {
+        toast.success(`${item.type === 'folder' ? 'Folder' : 'File'} unshared successfully`);
+        fetchFolderContents(currentFolder._id);
+      } else {
+        toast.error(`Failed to unshare ${item.type}`);
+      }
+    } catch (error) {
+      console.error(`Error unsharing ${item.type}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while unsharing the ${item.type}`);
+    }
+  };
   
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -193,7 +225,16 @@ const FileExplorerContainer = () => {
           <p className="text-red-500 text-center">{error}</p>
         ) : (
           <AnimatePresence>
-            {filteredContents.map(item => (
+            {filteredContents.map(item => {
+            
+            const itemObject = {
+              ... item,
+              onItemUpdate: () => fetchFolderContents(currentFolder._id),
+              onItemShare: () => handleShare(item),
+              onItemUnshare: () => handleUnshare(item),
+            }
+            
+            return (
               <motion.div
                 key={item._id}
                 variants={itemVariants}
@@ -204,19 +245,19 @@ const FileExplorerContainer = () => {
               >
                 {item.type === 'folder' ? (
                   <FolderComponent 
-                    folder={item} 
+                    AllFolder={itemObject}
                     onFolderClick={() => handleFolderClick(item._id)}
-                    onFolderUpdate={() => fetchFolderContents(currentFolder._id)}
+                    isShared={item.isShared}
                   />
                 ) : (
                   <FileComponent 
-                    file={item}
-                    onFileUpdate={() => fetchFolderContents(currentFolder._id)}
+                    AllFile={itemObject}
                     onFileClick={() => handleFileClick(item._id)}
+                    isShared={item.isShared}
                   />
                 )}
               </motion.div>
-            ))}
+            )})}
           </AnimatePresence>
         )}
       </div>
