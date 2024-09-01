@@ -38,19 +38,15 @@
   }
 
   .file-upload-container {
-    @apply relative ;
+    @apply relative;
   }
   .file-upload-button {
     @apply px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50;
   }
 
   .file-upload-input {
-    @apply absolute inset-0 w-full h-full opacity-0 cursor-pointer;
+    @apply px-4 py-2 absolute inset-0 w-full h-full opacity-0 cursor-pointer;
   }
-  /* .file-explorer-actions button,
-  .file-explorer-actions input[type="file"] {
-    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
-  } */
 
   .file-explorer-content {
     @apply p-4 overflow-y-auto relative;
@@ -76,7 +72,7 @@
   .file-explorer-content::-webkit-scrollbar-thumb:hover {
     @apply bg-blue-500;
   }
-  
+
   .folder-component,
   .file-component {
     @apply flex items-center p-2 text-black hover:bg-gray-100 rounded cursor-pointer;
@@ -95,8 +91,22 @@
   .file-info {
     @apply text-sm text-gray-500 mr-2;
   }
-  /*Three dots menu styles*/
 
+  /* Folder renaming styles */
+  .folder-editable {
+    @apply flex items-center p-2 text-black hover:bg-gray-100 rounded cursor-pointer;
+  }
+
+  .folder-editable-input {
+    @apply p-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500;
+    min-width: 100px;
+  }
+
+  .folder-icon-placeholder {
+    @apply w-6 h-6 mr-2;
+  }
+
+  /* Three dots menu styles */
   .three-dots-menu {
     @apply relative inline-block;
   }

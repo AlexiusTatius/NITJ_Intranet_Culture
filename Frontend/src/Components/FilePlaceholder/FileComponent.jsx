@@ -1,121 +1,128 @@
-import React from 'react';
-import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import {apiTeacherInstance} from '../../Helper/axiosInstance';
+import React from "react";
+import PropTypes from "prop-types";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles for react-toastify
+import ThreeDotsMenu from "../ThreeDotsMenu/ThreeDots";
+import { apiTeacherInstance } from "../../Helper/axiosInstance";
 
-const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) => {
-  const fileId = AllFile ? AllFile._id : SharedFile._id;
-  const fileName = AllFile ? AllFile.name : SharedFile.name;
-  const fileMimeType = AllFile ? AllFile.mimeType : SharedFile.mimeType;
-  const fileSize = AllFile ? AllFile.size : SharedFile.size;
-  const fileUpdatedAt = AllFile ? AllFile.updatedAt : SharedFile.updatedAt;
+const FileComponent = ({ file, onFileClick, isShared }) => {
+  // Check if the file prop is provided and is valid
+  if (!file) {
+    console.error("FileComponent: `file` prop is missing or undefined.");
+    return <div>Error: File data not found</div>;
+  }
+
+  const { _id, name } = file;
 
   const handleRename = async (newName) => {
     if (!newName) return;
 
     try {
-      const response = await apiTeacherInstance.put(`/file-folder/renameFile/${fileId}`,
+      const response = await apiTeacherInstance.put(
+        `/file-folder/renameFile/${_id}`,
         { newName }
       );
 
       if (response.data.message) {
-        AllFile.onItemUpdate();
-        toast.success('File renamed successfully!');
+        // Refresh or update the list to reflect changes
+        if (onFileClick) onFileClick();
       } else {
-        toast.error('Failed to rename file');
+        toast.error("Failed to rename file");
       }
     } catch (error) {
-      console.error('Error renaming file:', error);
-      toast.error(error.response?.data?.error || 'An error occurred while renaming the file');
+      console.error("Error renaming file:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "An error occurred while renaming the file"
+      );
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the file "${fileName}"?`);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the file "${name}"?`
+    );
     if (!confirmDelete) return;
 
     try {
-      const response = await apiTeacherInstance.delete(`/file-folder/deleteFile/${fileId}`,);
+      const response = await apiTeacherInstance.delete(
+        `/file-folder/deleteFile/${_id}`,
+        {
+          data: { confirmDelete: true },
+        }
+      );
+
       if (response.data.message) {
-        AllFile.onItemUpdate();
-        toast.success('File deleted successfully!');
+        // Refresh or update the list to reflect changes
+        if (onFileClick) onFileClick();
       } else {
-        toast.error('Failed to delete file');
+        toast.error("Failed to delete file");
       }
     } catch (error) {
-      console.error('Error deleting file:', error);
-      toast.error(error.response?.data?.error || 'An error occurred while deleting the file');
+      console.error("Error deleting file:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "An error occurred while deleting the file"
+      );
     }
+  };
+
+  const handleThreeDotsClick = (event) => {
+    event.stopPropagation(); // Stop the click event from propagating to the parent
   };
 
   return (
     <div className="file-component" onClick={() => onFileClick()}>
-      <img src="/Pdf.svg" alt={fileMimeType} className="file-icon" />
-      <span className="file-name">{fileName}</span>
-      <span className="file-info">{(fileSize / 1024).toFixed(2)} KB</span>
-      <span className="file-info hidden md:inline-block" >
-        | Last modified: {new Date(fileUpdatedAt).toLocaleDateString()}
-      </span>
-      {AllFile && (
-        isShared ? (
+      <img src="/File.svg" alt="File" className="file-icon" />
+      <span className="file-name">{name}</span>
+      <div onClick={handleThreeDotsClick}>
+        {isShared ? (
           <ThreeDotsMenu
             options={[
               {
-                label: 'Rename',
+                label: "Rename",
                 action: () => {
-                  const newName = prompt('Enter new file name:', fileName);
+                  const newName = prompt("Enter new file name:", name);
                   if (newName) handleRename(newName);
-                }
+                },
               },
               {
-                label: 'Delete',
-                action: handleDelete
+                label: "Delete",
+                action: handleDelete,
               },
-              {
-                label: "Unshare",
-                action: AllFile.onItemUnshare,
-              },
+              // Add other options if needed
             ]}
           />
         ) : (
           <ThreeDotsMenu
             options={[
               {
-                label: 'Rename',
+                label: "Rename",
                 action: () => {
-                  const newName = prompt('Enter new folder name:', fileName);
+                  const newName = prompt("Enter new file name:", name);
                   if (newName) handleRename(newName);
-                }
+                },
               },
               {
-                label: 'Delete',
-                action: handleDelete
+                label: "Delete",
+                action: handleDelete,
               },
-              {
-                label: "Share",
-                action: AllFile.onItemShare,
-              }
+              // Add other options if needed
             ]}
           />
-        )
-      )}
-      {SharedFile && (
-        isShared ?(
-          <ThreeDotsMenu
-          options={[
-            {
-              label: 'Unshare',
-              action: SharedFile.onItemUnshare,
-            }
-          ]}
-        />
-        ) : (
-        <></>
-        ) 
-      )}
+        )}
+      </div>
     </div>
   );
+};
+
+FileComponent.propTypes = {
+  file: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  onFileClick: PropTypes.func,
+  isShared: PropTypes.bool,
 };
 
 export default FileComponent;
