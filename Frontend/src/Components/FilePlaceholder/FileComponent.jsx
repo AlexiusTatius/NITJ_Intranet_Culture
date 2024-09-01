@@ -49,36 +49,6 @@ const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) =
     }
   };
 
-  const handleShare = async () => {
-    try {
-      const response = await apiTeacherInstance.put(`/file-folder/shareFile/${file._id}`);
-      if (response.data.message) {
-        toast.success(`File shared successfully`);
-        onFileUpdate();
-      } else {
-        toast.error(`Failed to share file`);
-      }
-    } catch (error) {
-      console.error(`Error sharing file:`, error);
-      toast.error(error.response?.data?.error || `An error occurred while sharing the file`);
-    }
-  };
-
-  const handleUnshare = async () => {
-    try {
-      const response = await apiTeacherInstance.put(`/file-folder/unshareFile/${file._id}`);
-      if (response.data.message) {
-        toast.success(`File unshared successfully`);
-        onFileUpdate();
-      } else {
-        toast.error(`Failed to unshare ${file.type}`);
-      }
-    } catch (error) {
-      console.error(`Error unsharing ${file.type}:`, error);
-      toast.error(error.response?.data?.error || `An error occurred while unsharing the ${file.type}`);
-    }
-  };
-
   return (
     <div className="file-component" onClick={() => onFileClick()}>
       <img src="/Pdf.svg" alt={fileMimeType} className="file-icon" />
