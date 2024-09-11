@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import ThreeDotsMenu from "../ThreeDotsMenu/ThreeDots";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { apiTeacherInstance } from "../../Helper/axiosInstance";
+import { DeleteConfirmation } from "./DeleteConfirmation"; // Import the DeleteConfirmation component
 
 const FileComponent = ({
   AllFile,
@@ -10,6 +11,9 @@ const FileComponent = ({
   onFileClick,
   isShared = false,
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false); // State for delete process
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State to open the delete dialog
+
   const fileId = AllFile ? AllFile._id : SharedFile._id;
   const fileName = AllFile ? AllFile.name : SharedFile.name;
   const fileMimeType = AllFile ? AllFile.mimeType : SharedFile.mimeType;
@@ -40,11 +44,12 @@ const FileComponent = ({
     }
   };
 
+  const confirmDelete = () => {
+    setOpenDeleteDialog(true); // Open the delete confirmation dialog
+  };
+
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete the file "${fileName}"?`
-    );
-    if (!confirmDelete) return;
+    setIsDeleting(true);
 
     try {
       const response = await apiTeacherInstance.delete(
@@ -62,11 +67,22 @@ const FileComponent = ({
         error.response?.data?.error ||
           "An error occurred while deleting the file"
       );
+    } finally {
+      setIsDeleting(false);
+      setOpenDeleteDialog(false); // Close the dialog after delete
     }
   };
 
   return (
-    <div className="file-component" onClick={() => onFileClick()}>
+    <div
+      className="file-component"
+      onClick={(e) => {
+        // Prevent click event on dialog content from triggering file open
+        if (e.target.closest(".dialog-content")) {
+          return;
+        }
+        onFileClick();
+      }}>
       <img src="/Pdf.svg" alt={fileMimeType} className="file-icon" />
       <span className="file-name">{fileName}</span>
       {AllFile &&
@@ -99,7 +115,7 @@ const FileComponent = ({
               },
               {
                 label: "Delete",
-                action: handleDelete,
+                action: confirmDelete, // Trigger delete confirmation dialog
               },
               {
                 label: "Unshare",
@@ -119,7 +135,7 @@ const FileComponent = ({
               },
               {
                 label: "Delete",
-                action: handleDelete,
+                action: confirmDelete, // Trigger delete confirmation dialog
               },
               {
                 label: "Share",
@@ -141,6 +157,16 @@ const FileComponent = ({
         ) : (
           <></>
         ))}
+
+      {/* Render the delete confirmation dialog */}
+      {openDeleteDialog && (
+        <DeleteConfirmation
+          open={openDeleteDialog}
+          setOpen={setOpenDeleteDialog}
+          handleDelete={handleDelete} // Pass the delete handler to the dialog
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 };
