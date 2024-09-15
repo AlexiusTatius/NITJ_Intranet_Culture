@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import FolderComponent from '../FolderPlaceholder/FolderComponent';
 import FileComponent from '../FilePlaceholder/FileComponent';
 import './FileExplorerContainer.css';
-import { Search, FolderPlus, Upload, ChevronLeft } from 'lucide-react';
+import { apiTeacherInstance } from '../../Helper/axiosInstance';
+import { Search, FolderPlus, Upload, ChevronLeft, Loader } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FileExplorerContainer = () => {
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -21,12 +24,7 @@ const FileExplorerContainer = () => {
   const fetchFolderContents = async (folderId) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('auth-token'); // Assuming you store the JWT in localStorage
-      const response = await axios.get(`http://localhost:8001/api/user/Teacher/file-folder/folderStructure/${folderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await apiTeacherInstance.get(`/file-folder/folderStructure/${folderId}`);
       const data = response.data;
       setContents([
         ...data.folderStructure.children.map(folder => ({ ...folder, type: 'folder' })),
@@ -57,7 +55,7 @@ const FileExplorerContainer = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredContents = contents.filter(item => 
+  const filteredContents = contents.filter(item =>  
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -66,33 +64,23 @@ const FileExplorerContainer = () => {
     if (!folderName) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.post(
-        'http://localhost:8001/api/user/Teacher/file-folder/createFolder',
-        {
-          name: folderName,
-          parentFolderId: currentFolder._id,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await apiTeacherInstance.post('/file-folder/createFolder', {
+        name: folderName,
+        parentFolderId: currentFolder._id,
+      });
 
       if (response.data._id) {
         fetchFolderContents(currentFolder._id);
-        alert('Folder created successfully');
+        toast.success('Folder created successfully');
       } else {
-        alert('Failed to create folder');
+        toast.error('Failed to create folder');
       }
     } catch (error) {
       console.error('Error creating folder:', error);
-      alert(error.response?.data?.error || 'An error occurred while creating the folder');
+      toast.error(error.response?.data?.error || 'An error occurred while creating the folder');
     }
   };
-
+  
   const handleFileUpload = async (event) => {
     const files = event.target.files;
     if (files.length === 0) return;
@@ -103,27 +91,21 @@ const FileExplorerContainer = () => {
     }
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.post(
-        `http://localhost:8001/api/user/Teacher/file-folder/uploadFile/${currentFolder._id}`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await apiTeacherInstance.post(`/file-folder/uploadFile/${currentFolder._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Override for file upload, the default is application/json which is defined in axiosInstance.js
+        },
+      });
 
       if (response.data.success) {
         fetchFolderContents(currentFolder._id);
-        alert(response.data.message || 'Files uploaded successfully');
+        toast.success(response.data.message || 'Files uploaded successfully');
       } else {
-        alert(response.data.message || response.data.error || 'Failed to upload files');
+        toast.error(response.data.message || response.data.error || 'Failed to upload files');
       }
     } catch (error) {
       console.error('Error uploading files:', error);
-      alert(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
+      toast.error(error.response?.data?.message || error.response?.data?.error || 'An error occurred while uploading files');
     }
   };
 
@@ -131,17 +113,69 @@ const FileExplorerContainer = () => {
     navigate(`/pdf-viewer/${fileId}`);
   };
 
+  const handleShare = async (item) => {
+    try {
+      const endpoint = item.type === 'folder' ? 'shareFolder' : 'shareFile';
+      const response = await apiTeacherInstance.put(`/file-folder/${endpoint}/${item._id}`);
+      if (response.data.message) {
+        toast.success(`${item.type === 'folder' ? 'Folder' : 'File'} shared successfully`);
+        fetchFolderContents(currentFolder._id);
+      } else {
+        toast.error(`Failed to share ${item.type}`);
+      }
+    } catch (error) {
+      console.error(`Error sharing ${item.type}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while sharing the ${item.type}`);
+    }
+  };
+
+  const handleUnshare = async (item) => {
+    try {
+      const endpoint = item.type === 'folder' ? 'unshareFolder' : 'unshareFile';
+      const response = await apiTeacherInstance.put(`/file-folder/${endpoint}/${item._id}`);
+      if (response.data.message) {
+        toast.success(`${item.type === 'folder' ? 'Folder' : 'File'} unshared successfully`);
+        fetchFolderContents(currentFolder._id);
+      } else {
+        toast.error(`Failed to unshare ${item.type}`);
+      }
+    } catch (error) {
+      console.error(`Error unsharing ${item.type}:`, error);
+      toast.error(error.response?.data?.error || `An error occurred while unsharing the ${item.type}`);
+    }
+  };
+  
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+  };
+
   return (
-    <div className="file-explorer-container">
+    <motion.div 
+      className="file-explorer-container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="file-explorer-header">
         <div className="flex items-center">
           {currentFolder && currentFolder.parentFolder && (
-            <button onClick={handleBackClick} className="back-button mr-3">
+            <motion.button 
+              onClick={handleBackClick} 
+              className="back-button mr-3"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <ChevronLeft size={16} className="inline mr-1" />
               Back
-            </button>
+            </motion.button>
           )}
-          <h2 className="folder-name">{currentFolder ? currentFolder.name : 'Root'}</h2>
+          <h2 className="folder-name text-2xl">{currentFolder ? currentFolder.name : 'Root'}</h2>
         </div>
         <div className="search-container">
           <Search className="search-icon" size={18} />
@@ -155,15 +189,24 @@ const FileExplorerContainer = () => {
         </div>
       </div>
       <div className="file-explorer-actions">
-        <button onClick={handleCreateFolder} className="create-folder-button">
+        <motion.button 
+          onClick={handleCreateFolder} 
+          className="create-folder-button"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <FolderPlus size={18} className="inline mr-2" />
-            Create Folder
-        </button>
+          Create Folder
+        </motion.button>
         <div className="file-upload-container">
-          <button className="file-upload-button">
+          <motion.button 
+            className="file-upload-button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <Upload size={18} className="inline mr-2" />
             Upload Files
-          </button>
+          </motion.button>
           <input 
             type="file" 
             onChange={handleFileUpload} 
@@ -175,30 +218,50 @@ const FileExplorerContainer = () => {
       </div>
       <div className="file-explorer-content">
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-64">
+            <Loader className="animate-spin text-blue-500" size={48} />
+          </div>
         ) : error ? (
-          <p>{error}</p>
+          <p className="text-red-500 text-center">{error}</p>
         ) : (
-          filteredContents.map(item => (
-            item.type === 'folder' ? (
-              <FolderComponent 
-                key={item._id} 
-                folder={item} 
-                onFolderClick={() => handleFolderClick(item._id)}
-                onFolderUpdate={() => fetchFolderContents(currentFolder._id)}
-              />
-            ) : (
-              <FileComponent 
-                key={item._id} 
-                file={item}
-                onFileUpdate={() => fetchFolderContents(currentFolder._id)}
-                onFileClick={() => handleFileClick(item._id)}
-              />
-            )
-          ))
+          <AnimatePresence>
+            {filteredContents.map(item => {
+            
+            const itemObject = {
+              ... item,
+              onItemUpdate: () => fetchFolderContents(currentFolder._id),
+              onItemShare: () => handleShare(item),
+              onItemUnshare: () => handleUnshare(item),
+            }
+            
+            return (
+              <motion.div
+                key={item._id}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                layout
+              >
+                {item.type === 'folder' ? (
+                  <FolderComponent 
+                    AllFolder={itemObject}
+                    onFolderClick={() => handleFolderClick(item._id)}
+                    isShared={item.isShared}
+                  />
+                ) : (
+                  <FileComponent 
+                    AllFile={itemObject}
+                    onFileClick={() => handleFileClick(item._id)}
+                    isShared={item.isShared}
+                  />
+                )}
+              </motion.div>
+            )})}
+          </AnimatePresence>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

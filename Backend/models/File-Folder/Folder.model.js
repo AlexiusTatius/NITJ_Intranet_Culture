@@ -31,6 +31,10 @@ const FolderSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  isShared: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
@@ -41,6 +45,9 @@ FolderSchema.index({ parent: 1, owner: 1, path: 1 }, { unique: true });
 
 // Index for efficient querying of a user's folders
 FolderSchema.index({ owner: 1, path: 1 });
+
+// Add index for efficient querying of isShared folders
+FolderSchema.index({ isShared: 1, owner: 1 });
 
 const FolderModel = mongoose.model('Folder', FolderSchema);
 

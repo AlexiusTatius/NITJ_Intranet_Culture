@@ -1,83 +1,119 @@
 import React from 'react';
-import axios from 'axios';
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {apiTeacherInstance} from '../../Helper/axiosInstance';
 
-const FileComponent = ({ file, onFileUpdate, onFileClick }) => {
+const FileComponent = ({ AllFile, SharedFile, onFileClick, isShared = false }) => {
+  const fileId = AllFile ? AllFile._id : SharedFile._id;
+  const fileName = AllFile ? AllFile.name : SharedFile.name;
+  const fileMimeType = AllFile ? AllFile.mimeType : SharedFile.mimeType;
+  const fileSize = AllFile ? AllFile.size : SharedFile.size;
+  const fileUpdatedAt = AllFile ? AllFile.updatedAt : SharedFile.updatedAt;
+
   const handleRename = async (newName) => {
     if (!newName) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.put(
-        `http://localhost:8001/api/user/Teacher/file-folder/renameFile/${file._id}`,
-        { newName },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
+      const response = await apiTeacherInstance.put(`/file-folder/renameFile/${fileId}`,
+        { newName }
       );
 
       if (response.data.message) {
-        onFileUpdate();
+        AllFile.onItemUpdate();
+        toast.success('File renamed successfully!');
       } else {
-        alert('Failed to rename file');
+        toast.error('Failed to rename file');
       }
     } catch (error) {
       console.error('Error renaming file:', error);
-      alert(error.response?.data?.error || 'An error occurred while renaming the file');
+      toast.error(error.response?.data?.error || 'An error occurred while renaming the file');
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the file "${file.name}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the file "${fileName}"?`);
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await axios.delete(
-        `http://localhost:8001/api/user/Teacher/file-folder/deleteFile/${file._id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await apiTeacherInstance.delete(`/file-folder/deleteFile/${fileId}`,);
       if (response.data.message) {
-        onFileUpdate();
+        AllFile.onItemUpdate();
+        toast.success('File deleted successfully!');
       } else {
-        alert('Failed to delete file');
+        toast.error('Failed to delete file');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
-      alert(error.response?.data?.error || 'An error occurred while deleting the file');
+      toast.error(error.response?.data?.error || 'An error occurred while deleting the file');
     }
   };
 
   return (
-    <div className="file-component" onClick={() => onFileClick(file._id)}>
-      <img src="/Pdf.svg" alt={file.mimeType} className="file-icon" />
-      <span className="file-name">{file.name}</span>
-      <span className="file-info">
-        {(file.size / 1024).toFixed(2)} KB | Last modified: {new Date(file.updatedAt).toLocaleDateString()}
+    <div className="file-component" onClick={() => onFileClick()}>
+      <img src="/Pdf.svg" alt={fileMimeType} className="file-icon" />
+      <span className="file-name">{fileName}</span>
+      <span className="file-info">{(fileSize / 1024).toFixed(2)} KB</span>
+      <span className="file-info hidden md:inline-block" >
+        | Last modified: {new Date(fileUpdatedAt).toLocaleDateString()}
       </span>
-      <ThreeDotsMenu
-        options={[
-          {
-            label: 'Rename',
-            action: () => {
-              const newName = prompt('Enter new file name:', file.name);
-              if (newName) handleRename(newName);
+      {AllFile && (
+        isShared ? (
+          <ThreeDotsMenu
+            options={[
+              {
+                label: 'Rename',
+                action: () => {
+                  const newName = prompt('Enter new file name:', fileName);
+                  if (newName) handleRename(newName);
+                }
+              },
+              {
+                label: 'Delete',
+                action: handleDelete
+              },
+              {
+                label: "Unshare",
+                action: AllFile.onItemUnshare,
+              },
+            ]}
+          />
+        ) : (
+          <ThreeDotsMenu
+            options={[
+              {
+                label: 'Rename',
+                action: () => {
+                  const newName = prompt('Enter new folder name:', fileName);
+                  if (newName) handleRename(newName);
+                }
+              },
+              {
+                label: 'Delete',
+                action: handleDelete
+              },
+              {
+                label: "Share",
+                action: AllFile.onItemShare,
+              }
+            ]}
+          />
+        )
+      )}
+      {SharedFile && (
+        isShared ?(
+          <ThreeDotsMenu
+          options={[
+            {
+              label: 'Unshare',
+              action: SharedFile.onItemUnshare,
             }
-          },
-          {
-            label: 'Delete',
-            action: handleDelete
-          },
-        ]}
-      />
+          ]}
+        />
+        ) : (
+        <></>
+        ) 
+      )}
     </div>
   );
 };

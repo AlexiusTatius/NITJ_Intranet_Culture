@@ -31,7 +31,7 @@ const ThreeDotsMenu = ({ options }) => {
 
   return (
     <div className="three-dots-menu" ref={menuRef}>
-      <button onClick={handleButtonClick} className="three-dots-button">
+      <button onClick={handleButtonClick} className="three-dots-button bg-blue-400">
         <MoreVertical size={20} />
       </button>
       {isOpen && (

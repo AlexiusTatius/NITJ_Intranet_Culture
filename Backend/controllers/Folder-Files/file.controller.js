@@ -10,40 +10,46 @@ import { TeacherFolderDir } from '../../config.js';
 
 
 const uploadFile = async (req, res) => {
-  try{
-    const { folderId } = req.params;
-    const userObject = req.user // Assume user is authenticated and available in req.user 
-                            //req.user is an object that contains the user information
-    
+  console.log("Go fuck yourself");
+  try {
+    const { parentFolderId } = req.params;
+    console.log("The parentFolderId is: ", parentFolderId);
+    console.log("The req.params is: ", req.params);
+    const userObject = req.user // Assume user is authenticated and available in req.user. req.user is an object that contains the user information
     const userId = userObject._id;
-
-    if (!isValidObjectId(folderId)) {
+    
+    let parentFolder = null;
+    let fileShared = false;
+    if (!isValidObjectId(parentFolderId)) {
       return res.status(400).json({ error: 'Invalid folder ID' });
     }
 
-    const folder = await FolderModel.findOne({ _id: folderId, owner: userId });
-    if (!folder) {
+    parentFolder = await FolderModel.findOne({ _id: parentFolderId, owner: userId });
+    if (!parentFolder) {
       return res.status(404).json({ error: 'Folder not found' });
     }
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
-
+    console.log("Bruh wtf");
     const uploadedFiles = [];
 
+    parentFolder.isShared === true ? fileShared = true : fileShared = false;
+    
+    console.log("Working before the loop");
     for (let file of req.files) {
-      const filePath = path.join(folder.path, file.filename).replace(/\\/g, '\\\\');
+      const filePath = path.join(parentFolder.path, file.filename).replace(/\\/g, '\\\\');
       const nameWithoutExt = path.basename(file.originalname, path.extname(file.originalname));
-      
-      console.log("nameWithoutExt", nameWithoutExt);
+
       const newFile = new FileModel({
         name: nameWithoutExt,
         mimeType: file.mimetype,
         size: file.size,
         path: filePath,
         storageLocation: file.path, // Full path where the file is stored
-        parentFolder: folderId,
+        parentFolder: parentFolderId,
+        isShared: fileShared,
         owner: userId,
         createdBy: userId,
         lastModifiedBy: userId
@@ -67,13 +73,13 @@ const uploadFile = async (req, res) => {
         }
       }
     }
-    
+    console.log("Working after the loop");
     res.status(201).json({
       success: true,
       message: 'Files uploaded successfully',
       files: uploadedFiles
     });
-  } catch(error){
+  } catch (error) {
     console.error('Error uploading files:', error);
     // If an error occurs, try to delete any files that were uploaded
     if (req.files) {
@@ -102,7 +108,7 @@ const deleteFile = async (req, res) => {
     if (!isValidObjectId(fileId)) {
       return res.status(400).json({ error: 'Invalid file ID' });
     }
-    
+
     const file = await FileModel.findOne({ _id: fileId, owner: userId });
     console.log("The file is: ", file);
     if (!file) {
@@ -148,11 +154,11 @@ const downloadFile = async (req, res) => {
     const fileStat = await stat(absoluteFilePath);
 
     var fileExtension;
-    if (file.mimeType === 'application/pdf'){
+    if (file.mimeType === 'application/pdf') {
       fileExtension = ".pdf";
-    }else if(file.mimeType === 'application/msword'){
+    } else if (file.mimeType === 'application/msword') {
       fileExtension = ".doc"
-    } else if(file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    } else if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       fileExtension = ".docx"
     }
 
@@ -245,6 +251,9 @@ const renameFile = async (req, res) => {
       return res.status(400).json({ error: 'Invalid file ID' });
     }
 
+    console.log("The fileId is: ", fileId);
+    console.log("The userId is: ", userId);
+    
     const file = await FileModel.findOne({ _id: fileId, owner: userId });
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
@@ -285,4 +294,4 @@ const renameFile = async (req, res) => {
   }
 };
 
-export {uploadFile, deleteFile, downloadFile, getPdfFile, renameFile};
+export { uploadFile, deleteFile, downloadFile, getPdfFile, renameFile };

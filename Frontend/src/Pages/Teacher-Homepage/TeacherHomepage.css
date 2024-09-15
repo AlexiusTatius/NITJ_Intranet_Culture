@@ -12,10 +12,10 @@
   }
 
   .page-header h1 {
-    @apply max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-3xl font-bold text-gray-900;
+    @apply max-w-full mx-auto py-6 px-4 sm:px-6 lg:px-8 text-3xl font-bold text-gray-900;
   }
 
   .page-content {
-    @apply max-w-7xl mx-auto py-6 sm:px-6 lg:px-8;
+    @apply max-w-full mx-auto py-0 sm:px-0 lg:px-0;
   }
 }
