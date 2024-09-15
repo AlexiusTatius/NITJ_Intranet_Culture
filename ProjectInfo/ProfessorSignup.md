@@ -1,1 +1,0 @@
-![Professor Signup](ProfessorSignup.png)
