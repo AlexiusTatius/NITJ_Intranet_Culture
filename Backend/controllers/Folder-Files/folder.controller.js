@@ -36,8 +36,9 @@ const createFolder = async (req, res) => {
     } else{
       return res.status(400).json({ error: 'Folder created outside the root folder is not allowed' });
     }
-    parentFolder.isShared === true ? folderShared = true : folderShared = false;
-    
+    folderShared = parentFolder.name === 'Root' ? false : parentFolder.isShared;
+
+    console.log('Folder Shared:', folderShared);
     const newFolder = new FolderModel({
       name,
       parentFolder: parentFolderId,
