@@ -2,15 +2,19 @@ import cors from 'cors';
 import express from 'express';
 import dotenv from "dotenv"
 import mongoose from 'mongoose';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 // import uploadRoutes from './routes/uploads.route.js';
 import TeacherUserRoute from './routes/UserRoutes/TeacherUser.route.js'
 import StudentUserRoute from './routes/UserRoutes/StudentUser.route.js'
 import forgotPasswordRoute from './routes/UserRoutes/forgotPassword.route.js'
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // App config
-dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
 const app = express()
 const port = process.env.PORT || 8000
 mongoose.set('strictQuery', true);

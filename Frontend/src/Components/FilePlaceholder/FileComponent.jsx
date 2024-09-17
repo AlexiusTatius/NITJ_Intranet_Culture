@@ -9,16 +9,17 @@ const FileComponent = ({
   AllFile,
   SharedFile,
   onFileClick,
+  StudentViewFile,
   isShared = false,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false); // State for delete process
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State to open the delete dialog
 
-  const fileId = AllFile ? AllFile._id : SharedFile._id;
-  const fileName = AllFile ? AllFile.name : SharedFile.name;
-  const fileMimeType = AllFile ? AllFile.mimeType : SharedFile.mimeType;
-  const fileSize = AllFile ? AllFile.size : SharedFile.size;
-  const fileUpdatedAt = AllFile ? AllFile.updatedAt : SharedFile.updatedAt;
+  const fileId = AllFile ? AllFile._id : (SharedFile ? SharedFile._id : StudentViewFile._id);
+  const fileName = AllFile ? AllFile.name : (SharedFile ? SharedFile.name : StudentViewFile.name);
+  const fileMimeType = AllFile ? AllFile.mimeType : (SharedFile ? SharedFile.mimeType : StudentViewFile.mimeType);
+  const fileSize = AllFile ? AllFile.size : (SharedFile ? SharedFile.size : StudentViewFile.size);
+  const fileUpdatedAt = AllFile ? AllFile.updatedAt : (SharedFile ? SharedFile.updatedAt : StudentViewFile.updatedAt);
 
   const handleRename = async (newName) => {
     if (!newName) return;
@@ -39,7 +40,7 @@ const FileComponent = ({
       console.error("Error renaming file:", error);
       toast.error(
         error.response?.data?.error ||
-          "An error occurred while renaming the file"
+        "An error occurred while renaming the file"
       );
     }
   };
@@ -65,7 +66,7 @@ const FileComponent = ({
       console.error("Error deleting file:", error);
       toast.error(
         error.response?.data?.error ||
-          "An error occurred while deleting the file"
+        "An error occurred while deleting the file"
       );
     } finally {
       setIsDeleting(false);
@@ -91,10 +92,14 @@ const FileComponent = ({
           ) : (
             <></>
           ))}
-        <span className="file-info">{(fileSize / 1024).toFixed(2)} KB</span>
-        <span className="file-info hidden md:inline-block">
-          | Last modified: {new Date(fileUpdatedAt).toLocaleDateString()}
-        </span>
+        {!StudentViewFile && (
+          <>
+            <span className="file-info">{(fileSize / 1024).toFixed(2)} KB</span>
+            <span className="file-info hidden md:inline-block">
+              | Last modified: {new Date(fileUpdatedAt).toLocaleDateString()}
+            </span>
+          </>
+        )}
         {AllFile &&
           (isShared ? (
             <ThreeDotsMenu
@@ -150,6 +155,9 @@ const FileComponent = ({
           ) : (
             <></>
           ))}
+        {StudentViewFile && (
+          <></>
+        )}
       </div>
       {/* Render the delete confirmation dialog */}
       <DeleteConfirmation

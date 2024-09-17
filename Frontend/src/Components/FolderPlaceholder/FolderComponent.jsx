@@ -4,9 +4,9 @@ import 'react-toastify/dist/ReactToastify.css'; // Import styles for react-toast
 import ThreeDotsMenu from '../ThreeDotsMenu/ThreeDots';
 import { apiTeacherInstance } from '../../Helper/axiosInstance';
 
-const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = false }) => {
-  const folderId = AllFolder ? AllFolder._id : SharedFolder._id;
-  const folderName = AllFolder ? AllFolder.name : SharedFolder.name;
+const FolderComponent = ({ AllFolder, SharedFolder, StudentViewFolder ,onFolderClick, isShared = false }) => {
+  const folderId = AllFolder ? AllFolder._id : (SharedFolder ? SharedFolder._id : StudentViewFolder._id);
+  const folderName = AllFolder ? AllFolder.name : (SharedFolder ? SharedFolder.name : StudentViewFolder.name);
 
   const handleRename = async (newName) => {
     if (!newName) return;
@@ -124,6 +124,11 @@ const FolderComponent = ({ AllFolder, SharedFolder, onFolderClick, isShared = fa
             <></>
           )
         )}
+        {
+          StudentViewFolder && (
+           <></>
+          )
+        }
       </div>
     </div>
   );
