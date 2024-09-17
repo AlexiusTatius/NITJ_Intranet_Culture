@@ -93,7 +93,7 @@ const FileExplorerContainer = () => {
     try {
       const response = await apiTeacherInstance.post(`/file-folder/uploadFile/${currentFolder._id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Override for file upload, the default is application/json which is defined in axiosInstance.js
+          'Content-Type': 'multipart/form-data', // Override for file upload
         },
       });
 
@@ -226,38 +226,36 @@ const FileExplorerContainer = () => {
         ) : (
           <AnimatePresence>
             {filteredContents.map(item => {
-            
-            const itemObject = {
-              ... item,
-              onItemUpdate: () => fetchFolderContents(currentFolder._id),
-              onItemShare: () => handleShare(item),
-              onItemUnshare: () => handleUnshare(item),
-            }
-            
-            return (
-              <motion.div
-                key={item._id}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                layout
-              >
-                {item.type === 'folder' ? (
-                  <FolderComponent 
-                    AllFolder={itemObject}
-                    onFolderClick={() => handleFolderClick(item._id)}
-                    isShared={item.isShared}
-                  />
-                ) : (
-                  <FileComponent 
-                    AllFile={itemObject}
-                    onFileClick={() => handleFileClick(item._id)}
-                    isShared={item.isShared}
-                  />
-                )}
-              </motion.div>
-            )})}
+              const itemObject = {
+                ...item,
+                onItemUpdate: () => fetchFolderContents(currentFolder._id),
+                onItemShare: () => handleShare(item),
+                onItemUnshare: () => handleUnshare(item),
+              }
+              return (
+                <motion.div
+                  key={item._id}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  layout
+                >
+                  {item.type === 'folder' ? (
+                    <FolderComponent 
+                      AllFolder={itemObject}
+                      onFolderClick={() => handleFolderClick(item._id)}
+                      isShared={item.isShared}
+                    />
+                  ) : (
+                    <FileComponent 
+                      AllFile={itemObject}
+                      onFileClick={() => handleFileClick(item._id)}
+                      isShared={item.isShared}
+                    />
+                  )}
+                </motion.div>
+              )})}
           </AnimatePresence>
         )}
       </div>

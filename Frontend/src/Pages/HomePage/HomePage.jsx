@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, UserPlus } from 'lucide-react';
 
 const HomePage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('auth-token');
+    if (token) {
+      // If logged in, redirect to the appropriate page
+      navigate('/Teacher/Homepage/allfiles', { replace: true });
+    }
+  }, [navigate]);
 
   const buttonVariants = {
     hover: { scale: 1.05 },
@@ -57,5 +66,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
