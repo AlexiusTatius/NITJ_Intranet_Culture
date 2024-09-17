@@ -12,10 +12,6 @@
     @apply flex items-center justify-between p-4 bg-gray-100 border-b border-gray-200;
   }
 
-  .student-shared-explorer-header h2 {
-    @apply text-xl font-bold text-gray-800;
-  }
-
   .back-button {
     @apply px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-sm;
   }
@@ -32,11 +28,30 @@
     @apply w-full pl-10 pr-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
   }
 
+  .view-toggle-button {
+    @apply text-gray-500 hover:text-blue-500 focus:outline-none transition-colors;
+  }
+
+  /* List Layout */
+  .list-layout {
+    @apply flex flex-col space-y-2;
+  }
+
+  /* Grid Layout */
+  .grid-layout {
+    @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+  }
+
+  .grid-item,
+  .list-item {
+    @apply bg-white rounded-lg list-none transition-shadow duration-200;
+  }
+
   .student-shared-explorer-content {
     @apply p-4 overflow-y-auto relative;
     max-height: calc(100vh - 200px);
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.blue.300') theme('colors.gray.200');
+    scrollbar-color: theme("colors.blue.300") theme("colors.gray.200");
     z-index: 1;
   }
 
