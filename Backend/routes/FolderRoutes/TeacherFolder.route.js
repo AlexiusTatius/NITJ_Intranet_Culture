@@ -26,6 +26,7 @@ router.put('/unshareFile/:fileId', requireAuth, unshareFileFxn);
 router.get("/sharedStructure/:folderId", requireAuth, getSharedStructure);
 
 router.get("/sharedStructure/:teacherEmailInitials/:folderId", studentPublicViewMiddleware, getSharedStructure);
+router.get("/getPdfFile/:teacherEmailInitials/:fileId", studentPublicViewMiddleware, getPdfFile); //check
 
 router.get("/generateUniqueShareableLink", requireAuth, generateUniqueShareableLink);
 
