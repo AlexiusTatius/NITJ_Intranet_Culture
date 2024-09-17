@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const apiTeacherInstance = axios.create({
-  baseURL: 'http://localhost:8001/api/user/Teacher',
+  baseURL: `${import.meta.env.VITE_BACKEND_BASE_URL ||'http://localhost:8001'}/api/user/Teacher`,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 const apiStudentInstance = axios.create({
-  baseURL: 'http://localhost:8001/api/user/Student',
+  baseURL: `${import.meta.env.VITE_BACKEND_BASE_URL ||'http://localhost:8001'}/api/user/Student`,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URI)  // Here I don't have to specify the dat
 // Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173"
+    origin: process.env.FRONTEND_BASE_URL || "http://localhost:5173"
 }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -40,7 +40,7 @@ app.use("/api/user/Student", StudentUserRoute)
 app.use("/api/user/forgotPassword", forgotPasswordRoute)
 // app.use("/api/uploads", uploadRoutes)
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`)
 });
 
