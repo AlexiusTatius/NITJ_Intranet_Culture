@@ -246,12 +246,14 @@ const FileExplorerContainer = () => {
                       AllFolder={itemObject}
                       onFolderClick={() => handleFolderClick(item._id)}
                       isShared={item.isShared}
+                      
                     />
                   ) : (
                     <FileComponent 
                       AllFile={itemObject}
                       onFileClick={() => handleFileClick(item._id)}
                       isShared={item.isShared}
+
                     />
                   )}
                 </motion.div>
