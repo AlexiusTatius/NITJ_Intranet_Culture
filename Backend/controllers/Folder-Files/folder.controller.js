@@ -33,7 +33,7 @@ const createFolder = async (req, res) => {
         return res.status(404).json({ error: 'Parent folder not found' });
       }
       folderPath = path.join(parentFolder.path, name).replace(/\\/g, '\\\\');
-    } else{
+    } else {
       return res.status(400).json({ error: 'Folder created outside the root folder is not allowed' });
     }
     folderShared = parentFolder.name === 'Root' ? false : parentFolder.isShared;
@@ -53,8 +53,8 @@ const createFolder = async (req, res) => {
     // Create the actual folder in the backend filesystem using TeacherFolderDir
     const absolutePath = path.join(TeacherFolderDir, folderPath);
 
-    await fs.mkdir(absolutePath, {recursive: true});
-    res.status(201).json(newFolder);  
+    await fs.mkdir(absolutePath, { recursive: true });
+    res.status(201).json(newFolder);
 
   } catch (error) {
     if (error.code === 11000) { // Duplicate key error
@@ -89,49 +89,49 @@ const deleteFolder = async (req, res) => {
     if (!folder) {
       return res.status(404).json({ error: 'Folder not found' });
     }
-    
+
     const folderPathRegex = escapeRegExp(folder.path);
 
-      // Check if folder is empty
-      const subfolderCount = await FolderModel.countDocuments({ 
-        path: { $regex: `^${folderPathRegex}(\\\\|$)` }, 
-        owner: userId 
-      });
-      const fileCount = await FileModel.countDocuments({ 
-        path: { $regex: `^${folderPathRegex}(\\\\|$)` }, 
-        owner: userId 
-      });
-  
-      const isEmpty = subfolderCount === 0 && fileCount === 0;
-  
-      if (!isEmpty && !confirmDelete) {
-        // Folder is not empty and confirmation not received
-        return res.status(409).json({
-          error: 'Confirmation required',
-          message: 'This folder contains subfolders or files. Confirmation required to delete.',
-          subfolderCount,
-          fileCount,
-          requiresConfirmation: true
-        });
-      }
-      
-      const folderPath = path.join(TeacherFolderDir, folder.path);
-      await fs.rm(folderPath, { recursive: true, force: true });
+    // Check if folder is empty
+    const subfolderCount = await FolderModel.countDocuments({
+      path: { $regex: `^${folderPathRegex}(\\\\|$)` },
+      owner: userId
+    });
+    const fileCount = await FileModel.countDocuments({
+      path: { $regex: `^${folderPathRegex}(\\\\|$)` },
+      owner: userId
+    });
 
-      // If we reach here, either the folder is empty or the user has confirmed deletion
-      // Delete all subfolders
-      await FolderModel.deleteMany({ path: { $regex: `^${folderPathRegex}(\\\\|$)` }, owner: userId });
-      await FileModel.deleteMany({ path: { $regex: `^${folderPathRegex}(\\\\|$)` }, owner: userId });
-  
-  
-      // Delete the folder itself
-      await FolderModel.findByIdAndDelete(folderId);
-  
-      res.status(200).json({ message: 'Folder and its contents deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting folder:', error);
-      res.status(500).json({ error: 'An error occurred while deleting the folder' });
+    const isEmpty = subfolderCount === 0 && fileCount === 0;
+
+    if (!isEmpty && !confirmDelete) {
+      // Folder is not empty and confirmation not received
+      return res.status(409).json({
+        error: 'Confirmation required',
+        message: 'This folder contains subfolders or files. Confirmation required to delete.',
+        subfolderCount,
+        fileCount,
+        requiresConfirmation: true
+      });
     }
+
+    const folderPath = path.join(TeacherFolderDir, folder.path);
+    await fs.rm(folderPath, { recursive: true, force: true });
+
+    // If we reach here, either the folder is empty or the user has confirmed deletion
+    // Delete all subfolders
+    await FolderModel.deleteMany({ path: { $regex: `^${folderPathRegex}(\\\\|$)` }, owner: userId });
+    await FileModel.deleteMany({ path: { $regex: `^${folderPathRegex}(\\\\|$)` }, owner: userId });
+
+
+    // Delete the folder itself
+    await FolderModel.findByIdAndDelete(folderId);
+
+    res.status(200).json({ message: 'Folder and its contents deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting folder:', error);
+    res.status(500).json({ error: 'An error occurred while deleting the folder' });
+  }
 }
 
 const renameFolder = async (req, res) => {
@@ -179,7 +179,7 @@ const renameFolder = async (req, res) => {
     if (newFolderExists) {
       return res.status(409).json({ error: 'A folder with this name already exists in the same location' });
     }
-    
+
     const moveContents = async (src, dest) => {
       await fs.mkdir(dest, { recursive: true });
       const entries = await fs.readdir(src, { withFileTypes: true });
@@ -187,7 +187,7 @@ const renameFolder = async (req, res) => {
       for (let entry of entries) {
         const srcPath = path.join(src, entry.name);
         const destPath = path.join(dest, entry.name);
-        
+
         if (entry.isDirectory()) {
           await moveContents(srcPath, destPath);
         } else {
@@ -217,18 +217,18 @@ const renameFolder = async (req, res) => {
     await folder.save();
 
     await FolderModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${oldPathRegex}(\\\\|$)` }
-        
+
       },
       [
-        { 
-          $set: { 
+        {
+          $set: {
             path: {
               $concat: [
                 newPathEscaped,
-                { 
+                {
                   $cond: {
                     if: { $eq: ["$_id", folderId] },
                     then: "",
@@ -245,13 +245,13 @@ const renameFolder = async (req, res) => {
 
     // Update all files within the folder
     await FileModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${oldPathRegex}(\\\\|$)` }
       },
       [
-        { 
-          $set: { 
+        {
+          $set: {
             path: {
               $concat: [
                 newPathEscaped,
@@ -275,58 +275,58 @@ const renameFolder = async (req, res) => {
 
 const getFolderStructure = async (req, res) => {
   try {
-      const userId = req.user._id;
-      const { folderId } = req.params; // Assuming the folder ID is passed as a route parameter
+    const userId = req.user._id;
+    const { folderId } = req.params; // Assuming the folder ID is passed as a route parameter
 
-      let targetFolder;
-      if (folderId === 'root') {
-          // If 'root' is specified, find the root folder for the user
-          targetFolder = await FolderModel.findOne({ owner: userId, parentFolder: null }).lean();
-      } else {
-          // Otherwise, find the specified folder
-          targetFolder = await FolderModel.findOne({ _id: folderId, owner: userId }).lean();
+    let targetFolder;
+    if (folderId === 'root') {
+      // If 'root' is specified, find the root folder for the user
+      targetFolder = await FolderModel.findOne({ owner: userId, parentFolder: null }).lean();
+    } else {
+      // Otherwise, find the specified folder
+      targetFolder = await FolderModel.findOne({ _id: folderId, owner: userId }).lean();
+    }
+
+    if (!targetFolder) {
+      return res.status(404).json({ error: 'Folder not found' });
+    }
+
+    // Get all subfolders of the target folder
+    const subFolders = await FolderModel.find({
+      owner: userId,
+      path: { $regex: `^${escapeRegExp(targetFolder.path)}([\\\\/]|$)` }
+    }).lean();
+
+    // Get all files in the target folder
+    const files = await FileModel.find({
+      owner: userId,
+      parentFolder: targetFolder._id
+    }).lean();
+
+    // Create a map of folders by their ID for easy access
+    const folderMap = new Map(subFolders.map(folder => [folder._id.toString(), { ...folder, children: [], files: [] }]));
+
+    // Organize folders into a tree structure
+    const rootFolder = folderMap.get(targetFolder._id.toString()) || { ...targetFolder, children: [], files: [] };
+    subFolders.forEach(folder => {
+      if (folder._id.toString() !== targetFolder._id.toString()) {
+        const parentFolder = folderMap.get(folder.parentFolder.toString());
+        if (parentFolder) {
+          parentFolder.children.push(folderMap.get(folder._id.toString()));
+        }
       }
+    });
 
-      if (!targetFolder) {
-          return res.status(404).json({ error: 'Folder not found' });
-      }
+    // Add files to the target folder
+    rootFolder.files = files;
 
-      // Get all subfolders of the target folder
-      const subFolders = await FolderModel.find({ 
-          owner: userId, 
-          path: { $regex: `^${escapeRegExp(targetFolder.path)}([\\\\/]|$)` }
-      }).lean();
-
-      // Get all files in the target folder
-      const files = await FileModel.find({ 
-          owner: userId, 
-          parentFolder: targetFolder._id
-      }).lean();
-
-      // Create a map of folders by their ID for easy access
-      const folderMap = new Map(subFolders.map(folder => [folder._id.toString(), { ...folder, children: [], files: [] }]));
-
-      // Organize folders into a tree structure
-      const rootFolder = folderMap.get(targetFolder._id.toString()) || { ...targetFolder, children: [], files: [] };
-      subFolders.forEach(folder => {
-          if (folder._id.toString() !== targetFolder._id.toString()) {
-              const parentFolder = folderMap.get(folder.parentFolder.toString());
-              if (parentFolder) {
-                  parentFolder.children.push(folderMap.get(folder._id.toString()));
-              }
-          }
-      });
-
-      // Add files to the target folder
-      rootFolder.files = files;
-
-      res.status(200).json({ folderStructure: rootFolder });
+    res.status(200).json({ folderStructure: rootFolder });
   } catch (error) {
-      console.error('Error fetching folder structure:', error);
-      res.status(500).json({ error: 'An error occurred while fetching the folder structure' });
+    console.error('Error fetching folder structure:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the folder structure' });
   }
 };
 
 
 
-export { createFolder, deleteFolder, renameFolder, getFolderStructure};
+export { createFolder, deleteFolder, renameFolder, getFolderStructure };
