@@ -294,7 +294,7 @@ const getFolderStructure = async (req, res) => {
       // Get all subfolders of the target folder
       const subFolders = await FolderModel.find({ 
           owner: userId, 
-          path: { $regex: `^${escapeRegExp(targetFolder.path)}(\\\\|$)` }
+          path: { $regex: `^${escapeRegExp(targetFolder.path)}([\\\\/]|$)` }
       }).lean();
 
       // Get all files in the target folder
