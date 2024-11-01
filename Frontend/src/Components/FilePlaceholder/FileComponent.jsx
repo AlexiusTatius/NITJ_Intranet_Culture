@@ -4,16 +4,16 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { apiTeacherInstance } from "../../Helper/axiosInstance";
 import { DeleteConfirmation } from "./DeleteConfirmation"; // Import the DeleteConfirmation component
+import { GeneratePdfLinkDialog } from "./GeneratePdfLink"; // Import the GeneratePdfLink component
 
-const FileComponent = ({
-  AllFile,
-  SharedFile,
-  onFileClick,
-  StudentViewFile,
-  isShared = false,
-}) => {
+
+const FileComponent = ({AllFile, SharedFile, onFileClick, StudentViewFile, isShared = false}) => {
   const [isDeleting, setIsDeleting] = useState(false); // State for delete process
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State to open the delete dialog
+  const [pdfLink, setPdfLink] = useState(""); // State to store the generated PDF link
+  const [openPdfDialog, setOpenPdfDialog] = useState(false); // State to check if the PDF link is generated
+  const [pdfIsLoading, setPdfIsLoading] = useState(false); // State to check if the PDF link is loading
+
 
   const fileId = AllFile ? AllFile._id : (SharedFile ? SharedFile._id : StudentViewFile._id);
   const fileName = AllFile ? AllFile.name : (SharedFile ? SharedFile.name : StudentViewFile.name);
@@ -74,6 +74,40 @@ const FileComponent = ({
     }
   };
 
+  const openPdfDialogBox = () => {
+    handleGeneratePdfLink(); // Open the GeneratePdfLink dialog
+  };
+
+  const handleGeneratePdfLink = async () => {
+    setPdfIsLoading(true);
+    console.log("Generating PDF link for file:", fileId);
+    try {
+      const response = await apiTeacherInstance.get(
+        `/file-folder/generatePdfLink/${fileId}`
+      );
+      if (response.data.success) {
+        setPdfLink(response.data.pdfLink);
+        setOpenPdfDialog(true);
+        toast({
+          title: "Success",
+          description: response.data.message,
+        });
+      } else {
+        throw new Error("Failed to generate link");
+      }
+    }catch (error) {
+      console.error("Error generating link:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate the PDF link. Please try again.",
+        variant: "destructive",
+      });
+    }finally {
+      setPdfIsLoading(false);
+    }
+  };
+  
+
   return (
     <>
       <div className="file-component" onClick={() => onFileClick()}>
@@ -119,6 +153,10 @@ const FileComponent = ({
                   label: "Unshare",
                   action: AllFile.onItemUnshare,
                 },
+                {
+                  label: pdfIsLoading ? "Generating..." : "Generate Link",
+                  action: openPdfDialogBox,
+                },
               ]}
             />
           ) : (
@@ -150,6 +188,10 @@ const FileComponent = ({
                   label: "Unshare",
                   action: SharedFile.onItemUnshare,
                 },
+                {
+                  label: pdfIsLoading ? "Generating..." : "Generate Link",
+                  action: openPdfDialogBox,
+                }
               ]}
             />
           ) : (
@@ -163,8 +205,13 @@ const FileComponent = ({
       <DeleteConfirmation
         open={openDeleteDialog}
         setOpen={setOpenDeleteDialog}
-        handleDelete={handleDelete} // Pass the delete handler to the dialog
+        handleDelete={handleDelete} 
         isDeleting={isDeleting}
+      />
+      <GeneratePdfLinkDialog
+        isOpen={openPdfDialog}
+        setIsOpen={setOpenPdfDialog}
+        pdfLink={pdfLink}
       />
     </>
   );
