@@ -4,12 +4,75 @@ import { motion } from "framer-motion";
 import axios from "axios";
 
 const LoginSignupTeacher = () => {
+  const departments = [
+    {
+      display: "Computer Science and Engineering (CSE)",
+      value: "Computer Science and Engineering"
+    },
+    {
+      display: "Information Technology (IT)",
+      value: "Information Technology"
+    },
+    {
+      display: "Electrical Engineering (EE)",
+      value: "Electrical Engineering"
+    },
+    {
+      display: "Electronics and Communication Engineering (ECE)",
+      value: "Electronics and Communication Engineering"
+    },
+    {
+      display: "Mechanical Engineering (ME)",
+      value: "Mechanical Engineering"
+    },
+    {
+      display: "Instrumentation and Control Engineering (ICE)",
+      value: "Instrumentation and Control Engineering"
+    },
+    {
+      display: "Civil Engineering (CE)",
+      value: "Civil Engineering"
+    },
+    {
+      display: "Chemical Engineering (CHE)",
+      value: "Chemical Engineering"
+    },
+    {
+      display: "Industrial and Production Engineering (IPE)",
+      value: "Industrial and Production Engineering"
+    },
+    {
+      display: "Biotechnology (BT)",
+      value: "Biotechnology"
+    },
+    {
+      display: "Textile Technology (TT)",
+      value: "Textile Technology"
+    },
+    {
+      display: "Physics (PHY)",
+      value: "Physics"
+    },
+    {
+      display: "Mathematics (MATH)",
+      value: "Mathematics"
+    },
+    {
+      display: "Chemistry (CHEM)",
+      value: "Chemistry"
+    },
+    {
+      display: "Humanities and Management (HM)",
+      value: "Humanities and Management"
+    }
+  ];
+
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    department: "", // Department field added for both login and sign-up
+    department: "",
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,19 +94,27 @@ const LoginSignupTeacher = () => {
   const changeHandler = (event) => {
     const { name, value } = event.target;
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+    if (name === "department") {
+      // Find the department object that matches the selected display value
+      const selectedDept = departments.find(dept => dept.display === value);
+      // Set the backend value in formData
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        [name]: selectedDept ? selectedDept.value : ""
+      }));
+    } else {
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
 
     setErrorMessage("");
 
     if (name === "email") {
       const emailPattern = /^[^\s@]+@nitj\.ac\.in$/;
       if (!emailPattern.test(value)) {
-        setEmailError(
-          "Please enter a valid email in the format: name@nitj.ac.in"
-        );
+        setEmailError("Please enter a valid email in the format: name@nitj.ac.in");
       } else {
         setEmailError("");
       }
@@ -70,8 +141,6 @@ const LoginSignupTeacher = () => {
       const dataObj = response.data;
       if (dataObj.success) {
         localStorage.setItem("auth-token", dataObj.token);
-
-        // Use replace: true to prevent going back to login page
         navigate("/Teacher/Homepage/allfiles", { replace: true });
       } else if (dataObj.errors) {
         setErrorMessage(dataObj.errors);
@@ -115,10 +184,7 @@ const LoginSignupTeacher = () => {
         <form onSubmit={handleSubmit} className="px-8 py-6 space-y-6">
           {state === "Sign Up" && (
             <div className="space-y-2">
-              <label
-                htmlFor="username"
-                className="text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="username" className="text-sm font-medium text-gray-700">
                 Username
               </label>
               <input
@@ -133,10 +199,7 @@ const LoginSignupTeacher = () => {
             </div>
           )}
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -158,10 +221,7 @@ const LoginSignupTeacher = () => {
             )}
           </div>
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -176,71 +236,24 @@ const LoginSignupTeacher = () => {
             />
           </div>
           <div className="space-y-2 w-full sm:max-w-md">
-            <label
-              htmlFor="department"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="department" className="text-sm font-medium text-gray-700">
               Department
             </label>
             <div className="relative">
               <select
                 id="department"
                 name="department"
-                value={formData.department}
+                value={departments.find(dept => dept.value === formData.department)?.display || ""}
                 onChange={changeHandler}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 style={{ maxHeight: "200px", overflowY: "scroll" }}
               >
                 <option value="">Select Department</option>
-                <option value="Biotechnology (BT)">Biotechnology (BT)</option>
-                <option value="Chemical Engineering (CHE)">
-                  Chemical Engineering (CHE)
-                </option>
-                <option value="Civil Engineering (CE)">
-                  Civil Engineering (CE)
-                </option>
-                <option value="Computer Science and Engineering (CSE)">
-                  Computer Science and Engineering (CSE)
-                </option>
-                <option value="Data Science and Engineering (DSE)">
-                  Data Science and Engineering (DSE)
-                </option>
-                <option value="Electrical Engineering (EE)">
-                  Electrical Engineering (EE)
-                </option>
-                <option value="Electronics and Communication Engineering (ECE)">
-                  Electronics and Communication Engineering (ECE)
-                </option>
-                <option value="Electronics and VLSI">
-                  Electronics and VLSI
-                </option>
-                <option value="Mathematics and Computing (MNC)">
-                  Mathematics and Computing (MNC)
-                </option>
-                <option value="Mechanical Engineering (ME)">
-                  Mechanical Engineering (ME)
-                </option>
-                <option value="Industrial and Production Engineering (IPE)">
-                  Industrial and Production Engineering (IPE)
-                </option>
-                <option value="Information Technology (IT)">
-                  Information Technology (IT)
-                </option>
-                <option value="Instrumentation and Control Engineering (ICE)">
-                  Instrumentation and Control Engineering (ICE)
-                </option>
-                <option value="Textile Technology (TT)">
-                  Textile Technology (TT)
-                </option>
-                <option value="Department of Physics">
-                  Department of Physics
-                </option>
-                <option value="Department of Mathematics">
-                  Department of Mathematics
-                </option>
-                <option value="Department of Chemistry">
-                  Department of Chemistry
-                </option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept.display}>
+                    {dept.display}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -304,6 +317,3 @@ const LoginSignupTeacher = () => {
 };
 
 export default LoginSignupTeacher;
-
-
-
