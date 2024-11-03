@@ -1,0 +1,17 @@
+export const DEPARTMENT_MAP = {
+  'Computer Science and Engineering': 'CSE',
+  'Information Technology': 'IT',
+  'Electrical Engineering': 'EE',
+  'Electronics and Communication Engineering': 'ECE',
+  'Mechanical Engineering': 'ME',
+  'Instrumentation and Control Engineering' : 'ICE',
+  'Civil Engineering': 'CE',
+  'Chemical Engineering': 'CHE',
+  'Industrial and Production Engineering': 'IPE',
+  'Biotechnology': 'BT',
+  'Textile Technology':'TT',
+  'Physics': 'PHY',
+  'Chemistry': 'CHEM',
+  'Mathematics': 'MATH',
+  'Humanities and Management': 'HM',
+};

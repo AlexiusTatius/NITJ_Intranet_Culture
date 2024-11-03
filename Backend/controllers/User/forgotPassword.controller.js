@@ -3,7 +3,14 @@ import { createTransport } from "nodemailer"
 import crypto from "crypto"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
-dotenv.config()
+import path from "path"
+import { fileURLToPath } from "url"
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '..', '.env') });
+
 
 // Route to handle "forgot password" request
 const forgotPassword = async (req, res) => {
@@ -36,15 +43,15 @@ const forgotPassword = async (req, res) => {
     port: 465,
     secure: true,
     auth: {
-      user: process.env.USER, //sender gmail adderss
-      pass: process.env.APP_PASSWORD  // app password from gmail account
+      user: process.env.EMAIL_USER, //sender gmail adderss
+      pass: process.env.EMAIL_APP_PASSWORD  // app password from gmail account
     }
   });
 
   var mailOptions = {
     from: {
       name: 'Administator Reset Password',
-      address: process.env.USER // sender email address
+      address: process.env.EMAIL_USER // sender email address
     },
     to: email,
     subject: "Reset Password",
