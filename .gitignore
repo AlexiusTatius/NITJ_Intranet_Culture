@@ -7,3 +7,4 @@ Backend/node_modules/
 
 # Ignore contents of TeacherFolders but keep the directory itself
 Backend/TeacherFolders/
+Backend/FacultyData/
