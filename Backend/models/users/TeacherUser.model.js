@@ -54,7 +54,7 @@ const TeacherUserSchema = new mongoose.Schema({
 TeacherUserSchema.index({ department: 1, email: 1 });
 
 TeacherUserSchema.statics.findByDepartmentAndEmail = async function(departmentId, email) {
-  const department = await DepartmentModel.findByDepartmentName(departmentId);
+  const department = await DepartmentModel.findByDepartmentId(departmentId);
   if (!department) {
     throw new DepartmentNotFoundError(ERROR_MESSAGES.DEPARTMENT_NOT_FOUND);
   }
@@ -87,17 +87,17 @@ TeacherUserSchema.statics.findByFacultyId = async function(facultyId) {
 
 TeacherUserSchema.statics.TeacherFacultyVerify = async function(userData){
     // Step 1: Verify whether the teacher is a faculty member   
-    const faculty = await FacultyModel.verifyFacultyMember(userData.email, userData.department);
+    const faculty = await FacultyModel.verifyFacultyMember(userData.email, userData.departmentName);
 
     // Step 2: Get and verify department
-    const department = await DepartmentModel.findByDepartmentName(userData.department);
+    const department = await DepartmentModel.findByDepartmentName(userData.departmentName);
 
     if (faculty && department){
-      logger.debug(`The teacher with email: ${userData.email} exists in the department: ${userData.department}`);
+      logger.debug(`The teacher with email: ${userData.email} exists in the department: ${userData.departmentName}`);
       return {faculty, department};
     }
     else{
-      logger.debug(`The teacher with email: ${userData.email} DOES NOT EXIST in the department: ${userData.department}`);
+      logger.debug(`The teacher with email: ${userData.email} DOES NOT EXIST in the department: ${userData.departmentName}`);
       return {};
     }
 }
@@ -106,7 +106,14 @@ TeacherUserSchema.statics.TeacherFacultyVerify = async function(userData){
 // Main registration method with transaction
 TeacherUserSchema.statics.registerTeacherFaculty = async function(userData) {
   const registerOperation = async (session) => {
+    console.log(userData);
     logger.info(`Starting teacher registration process for email: ${userData.email}`);
+
+    // Find the department first
+    const department = await DepartmentModel.findById(userData.department).session(session);
+    if (!department) {
+      throw new Error('Department not found');
+    }
 
     // Step 3: Create teacher user
     const teacherUser = new this({

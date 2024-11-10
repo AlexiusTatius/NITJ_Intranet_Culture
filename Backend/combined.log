@@ -1,0 +1,32 @@
+{"level":"error","message":"Faculty verification failed: Invalid department name provided","timestamp":"2024-11-03T18:46:02.797Z"}
+{"level":"info","message":"Faculty member verified in department: Biotechnology","timestamp":"2024-11-03T18:54:33.948Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-03T19:37:58.900Z"}
+{"level":"error","message":"Transaction failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-03T19:37:58.912Z"}
+{"level":"error","message":"Teacher registration failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-03T19:37:58.914Z"}
+{"level":"info","message":"Faculty member verified in department: Biotechnology","timestamp":"2024-11-09T23:58:37.024Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T00:06:52.717Z"}
+{"level":"error","message":"Transaction failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:06:52.737Z"}
+{"level":"error","message":"Teacher registration failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:06:52.739Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T00:36:07.615Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T00:38:43.322Z"}
+{"level":"error","message":"Transaction failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:38:43.326Z"}
+{"level":"error","message":"Teacher registration failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:38:43.327Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T00:43:19.638Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T00:47:32.643Z"}
+{"level":"error","message":"Transaction failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:47:32.654Z"}
+{"level":"error","message":"Teacher registration failed: TeacherUser validation failed: folderPath: Path `folderPath` is required., faculty: Path `faculty` is required., department: Path `department` is required., password: Path `password` is required., email: Path `email` is required., username: Path `username` is required.","timestamp":"2024-11-10T00:47:32.656Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T01:01:27.531Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T01:02:10.545Z"}
+{"level":"error","message":"Transaction failed: department is not defined","timestamp":"2024-11-10T01:02:10.554Z"}
+{"level":"error","message":"Teacher registration failed: department is not defined","timestamp":"2024-11-10T01:02:10.555Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T01:10:17.863Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T01:11:44.877Z"}
+{"level":"error","message":"Transaction failed: department is not defined","timestamp":"2024-11-10T01:11:44.888Z"}
+{"level":"error","message":"Teacher registration failed: department is not defined","timestamp":"2024-11-10T01:11:44.889Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T09:24:48.446Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T09:31:10.258Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T09:32:12.824Z"}
+{"level":"info","message":"Teacher registration completed successfully for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T09:32:12.895Z"}
+{"level":"info","message":"Faculty member verified in department: Computer Science and Engineering","timestamp":"2024-11-10T09:43:33.274Z"}
+{"level":"info","message":"Starting teacher registration process for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T09:44:49.515Z"}
+{"level":"info","message":"Teacher registration completed successfully for email: mehtabs.cs.21@nitj.ac.in","timestamp":"2024-11-10T09:44:49.556Z"}

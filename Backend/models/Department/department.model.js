@@ -39,8 +39,19 @@ const departmentSchema = new mongoose.Schema({
   }
 });
 
+// Static method to find department by ID
+departmentSchema.statics.findByDepartmentId = async function(departmentId) {
+  const department = await this.findOne({ departmentID : departmentId });
+  if (!department) {
+    throw new DepartmentNotFoundError(ERROR_MESSAGES.DEPARTMENT_NOT_FOUND);
+  }
+
+  return department;
+}
+
 // Static method to find department by name
 departmentSchema.statics.findByDepartmentName = async function(name) {
+  console.log("name: ", name);
   const departmentId = DEPARTMENT_MAP[name];
   if (!departmentId) {
     throw new DepartmentNotFoundError(ERROR_MESSAGES.INVALID_DEPARTMENT);

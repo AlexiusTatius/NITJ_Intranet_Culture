@@ -43,16 +43,34 @@ const loginUser = async (req, res) => {
 
 //register user
 const verificationBeforeRegister = async (req, res) => {
-    const { username, email, password, departmentName } = req.body;
+    const { username, email, password, department } = req.body;
     console.log(req.body);
+
+    const departmentName = department;
     try {
         //check if user already exists
         const exists = await TeacherUserModel.findOne({ email })
         if (exists) {
             return res.status(400).json({ message: "User already exists" })
         }
-        if (validator.isEmpty(username) || validator.isEmpty(email) || validator.isEmpty(password) || validator.isEmpty(departmentName)) {
-            return res.status(400).json({ message: "Please enter all fields" })
+        if (!username || !email || !password || !departmentName) {
+            const missingFields = [];
+            if (!username) missingFields.push('username');
+            if (!email) missingFields.push('email');
+            if (!password) missingFields.push('password');
+            if (!departmentName) missingFields.push('departmentName');
+            
+            return res.status(400).json({ 
+                message: `Missing required fields: ${missingFields.join(', ')}` 
+            });
+        }
+        
+        // Then validate the non-empty fields
+        if (validator.isEmpty(username.trim()) || 
+            validator.isEmpty(email.trim()) || 
+            validator.isEmpty(password.trim()) || 
+            validator.isEmpty(departmentName.trim())) {
+            return res.status(400).json({ message: "Please enter all fields" });
         }
         if (!validator.isEmail(email)) {
             return res.status(400).json({ message: "Please enter a valid email" })
@@ -122,36 +140,49 @@ const verificationBeforeRegister = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
     try {
+        console.log("Bruh");
         const { departmentId, userEmail, emailVerifyToken } = req.query;
-        
+        console.log("departmentId: ", departmentId);
+        console.log("userEmail: ", userEmail);
+        console.log("emailVerifyToken: ", emailVerifyToken);
+
+        console.log("Bruh-1.5")
         const user = await TeacherUserModel.findOne({
             verificationToken: emailVerifyToken,
             verificationTokenExpires: { $gt: Date.now() },
             isEmailVerified: false
         });
+        console.log("Bruh2");
+        console.log("Bruh2");
+        console.log("Bruh2");
 
         if (!user) {
-            const expiredTokenUser = await TeacherUserModel.findByDepartmentAndEmail({ departmentId, email: userEmail });
+            const expiredTokenUser = await TeacherUserModel.findByDepartmentAndEmail( departmentId, userEmail );
             // delete the user if verification token is invalid or expired
             if(expiredTokenUser) {
                 // delete the user
                 await expiredTokenUser.deleteOne();
                 console.log('User deleted:', expiredTokenUser);
-            }
-            return res.status(400).json({
-                success: false,
-                message: "Invalid or expired verification token"
-            });
-        }
 
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid or expired verification token"
+                });
+            }
+        }
+        console.log("Bruh3");
         // Update user verification status
         user.isEmailVerified = true;
+        console.log("Bruh4");
         user.verificationToken = undefined;
         user.verificationTokenExpires = undefined;
 
         // Finalize registration
+        const userCopy = user.toObject();
+        console.log("userCopy: ", userCopy);
+
         await user.deleteOne();
-        await finalRegistrationAfterVerification(user);
+        await finalRegistrationAfterVerification(userCopy, res);
 
     } catch (error) {
         console.error('Verification error:', error);
@@ -162,7 +193,7 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-const finalRegistrationAfterVerification = async (userObject) => {
+const finalRegistrationAfterVerification = async (userObject, res) => {
     
     try {
         await TeacherUserModel.registerTeacherFaculty(userObject);
@@ -176,16 +207,11 @@ const finalRegistrationAfterVerification = async (userObject) => {
             owner: userObject._id,
             isShared: true
         });
+        await rootFolder.save();
 
         // Create physical directory
         const absoluteRootPath = path.join(TeacherFolderDir, rootFolderPath);
         await fs.mkdir(absoluteRootPath, { recursive: true });
-
-        // Save everything
-        await Promise.all([
-            user.save(),
-            rootFolder.save()
-        ]);
 
         // Send success email
         await EmailUtils.sendSuccessEmail(userObject.email, userObject.username);
