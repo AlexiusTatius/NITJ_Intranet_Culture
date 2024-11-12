@@ -32,7 +32,7 @@ const ForgotPassword = () => {
 
             const dataObj = response.data;
             if (dataObj.success) {
-                setMessage('Password reset link sent to your email.');
+                setMessage(dataObj.message ||'Password reset link sent to your email.');
                 setTimeout(() => window.location.replace('/'), 3000);
             } else {
                 setMessage(dataObj.errors || 'An error occurred. Please try again.');

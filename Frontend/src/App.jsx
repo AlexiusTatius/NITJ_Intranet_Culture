@@ -12,6 +12,7 @@ import StudentViewHomepageSharedFiles from "./Pages/Teacher-Homepage/TeacherHome
 import { Toaster } from "react-hot-toast";
 import { Fragment } from "react";
 import SearchPortal from "./Pages/SearchPortal/SearchPortal";
+import EmailVerification from "./Pages/EmailVerification/EmailVerification.jsx";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           element={<PdfViewerPage />}
         />
         <Route path="/searchportal" element={<SearchPortal />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
       </Routes>
     </Fragment>
   );

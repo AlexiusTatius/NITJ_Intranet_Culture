@@ -1,91 +1,94 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Copy,
-  Check,
-  Search,
-  ExternalLink,
-  ChevronRight,
-  ArrowLeft,
-} from "lucide-react";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Input } from "@/Components/ui/input";
-import { Alert, AlertDescription } from "@/Components/ui/alert";
-
-const departments = [
-  "Biotechnology",
-  "Chemistry",
-  "Chemical Engineering",
-  "Civil Engineering",
-  "Computer Science and Engineering",
-  "Electronics and Communication Engineering",
-  "Electrical Engineering",
-  "Humanities and Management",
-  "Industrial and Production Engineering",
-  "Information Technology",
-  "Instrumentation and Control Engineering",
-  "Mathematics and Computing",
-  "Mechanical Engineering",
-  "Physics",
-  "Textile Technology",
-];
-
-const generateTeachers = (dept) => {
-  const deptCode = dept.split(" ")[0].toLowerCase();
-  const teachers = [
-    {
-      name: "Chahat Kesharwani",
-      email: "chahatk.ic.23@nitj.ac.in",
-    },
-  ];
-
-  const firstNames = ["Amit", "Priya", "Rahul", "Neha", "Vikram", "Sneha"];
-  const lastNames = ["Kumar", "Sharma", "Singh", "Gupta", "Verma", "Patel"];
-
-  for (let i = 0; i < 6; i++) {
-    const firstName = firstNames[i];
-    const lastName = lastNames[i];
-    const shortName = (
-      firstName.slice(0, 3) + lastName.slice(0, 1)
-    ).toLowerCase();
-    teachers.push({
-      name: `${firstName} ${lastName}`,
-      email: `${shortName}.${deptCode}.23@nitj.ac.in`,
-    });
-  }
-
-  return teachers;
-};
+import { Search, ChevronRight, ArrowLeft, Loader, ExternalLink, Copy, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { apiTeacherInstance } from "../../Helper/axiosInstance";
 
 const SearchPortal = () => {
   const navigate = useNavigate();
+  const [departments, setDepartments] = useState([]);
   const [selectedDept, setSelectedDept] = useState("");
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [teachers, setTeachers] = useState([]);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [deptSearch, setDeptSearch] = useState("");
   const [teacherSearch, setTeacherSearch] = useState("");
   const [copied, setCopied] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 
+  // Loading states
+  const [isLoadingDepts, setIsLoadingDepts] = useState(true);
+  const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+
+  // Error states
+  const [deptError, setDeptError] = useState(null);
+  const [teacherError, setTeacherError] = useState(null);
+  const [linkError, setLinkError] = useState(null);
+
+  // Fetch departments on component mount
   useEffect(() => {
-    if (selectedDept) {
-      setTeachers(generateTeachers(selectedDept));
-      setTeacherSearch("");
-      setSelectedTeacher(null);
-    }
+    const fetchDepartments = async () => {
+      try {
+        setDeptError(null);
+        const response = await apiTeacherInstance.get('/file-folder/departments');
+        if (response.data.success) {
+          setDepartments(response.data.departments);
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch departments');
+        }
+      } catch (err) {
+        setDeptError(err.response?.data?.message || 'Failed to load departments. Please try again.');
+        console.error('Department fetch error:', err);
+      } finally {
+        setIsLoadingDepts(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  // Fetch teachers when department is selected
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      if (!selectedDept) {
+        setTeachers([]);
+        return;
+      }
+
+      setIsLoadingTeachers(true);
+      try {
+        setTeacherError(null);
+        const response = await apiTeacherInstance.get(`/file-folder/teachers/${selectedDept._id}`);
+        if (response.data.success) {
+          setTeachers(response.data.teachers);
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch teachers');
+        }
+      } catch (err) {
+        setTeacherError(err.response?.data?.message || 'Failed to load teachers. Please try again.');
+        console.error('Teacher fetch error:', err);
+      } finally {
+        setIsLoadingTeachers(false);
+      }
+    };
+
+    fetchTeachers();
   }, [selectedDept]);
 
+  // Filter functions
   const filteredDepts = departments.filter((dept) =>
-    dept.toLowerCase().includes(deptSearch.toLowerCase())
+    dept.name.toLowerCase().includes(deptSearch.toLowerCase())
   );
 
-  const filteredTeachers = teachers.filter(
-    (teacher) =>
-      teacher.name.toLowerCase().includes(teacherSearch.toLowerCase()) ||
-      teacher.email.toLowerCase().includes(teacherSearch.toLowerCase())
+  const filteredTeachers = teachers.filter((teacher) =>
+    teacher.name.toLowerCase().includes(teacherSearch.toLowerCase()) ||
+    teacher.email.toLowerCase().includes(teacherSearch.toLowerCase())
   );
 
+  // Helper functions
   const getTeacherInitials = (email) => {
     return email.split("@")[0];
   };
@@ -97,6 +100,7 @@ const SearchPortal = () => {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
+      setLinkError('Failed to copy to clipboard');
     }
   };
 
@@ -107,17 +111,28 @@ const SearchPortal = () => {
   };
 
   const handleVisitFiles = () => {
+    if (!selectedTeacher) return;
     const route = `/${getTeacherInitials(selectedTeacher.email)}/Sharedfiles`;
     window.open(route, "_blank");
+  };
+
+  const handleDepartmentSelect = (dept) => {
+    setSelectedDept(dept);
+    setSelectedTeacher(null);
+    setTeacherSearch("");
+    setTeacherError(null);
+  };
+
+  const handleTeacherSelect = (teacher) => {
+    setSelectedTeacher(teacher);
+    setShowMobilePreview(true);
+    setLinkError(null);
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       {/* Left Panel - Selection */}
-      <div
-        className={`w-full lg:w-1/2 p-4 lg:p-8 ${
-          showMobilePreview ? "hidden lg:block" : ""
-        }`}>
+      <div className={`w-full lg:w-1/2 p-4 lg:p-8 ${showMobilePreview ? "hidden lg:block" : ""}`}>
         <div className="max-w-2xl mx-auto">
           <h2 className="text-2xl font-semibold mb-6 text-gray-900 flex items-center">
             <Search className="h-5 w-5 mr-2 text-gray-600" />
@@ -139,30 +154,40 @@ const SearchPortal = () => {
                 value={deptSearch}
                 onChange={(e) => setDeptSearch(e.target.value)}
                 className="pl-10 mb-2 bg-white"
+                disabled={isLoadingDepts}
                 aria-label="Search departments"
               />
             </div>
+
+            {deptError && (
+              <Alert className="mb-2" variant="destructive">
+                <AlertDescription>{deptError}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="max-h-48 overflow-auto border rounded-lg bg-white shadow-sm">
-              {filteredDepts.length > 0 ? (
+              {isLoadingDepts ? (
+                <div className="flex justify-center items-center h-20">
+                  <Loader className="h-6 w-6 animate-spin text-gray-500" />
+                </div>
+              ) : filteredDepts.length > 0 ? (
                 filteredDepts.map((dept) => (
                   <button
-                    key={dept}
-                    onClick={() => {
-                      setSelectedDept(dept);
-                      setDeptSearch("");
-                    }}
+                    key={dept._id}
+                    onClick={() => handleDepartmentSelect(dept)}
                     className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center justify-between ${
-                      selectedDept === dept ? "bg-gray-50 text-blue-600" : ""
-                    }`}>
-                    <span>{dept}</span>
-                    {selectedDept === dept && (
+                      selectedDept?._id === dept._id ? "bg-gray-50 text-blue-600" : ""
+                    }`}
+                  >
+                    <span>{dept.name}</span>
+                    {selectedDept?._id === dept._id && (
                       <ChevronRight className="h-4 w-4" />
                     )}
                   </button>
                 ))
               ) : (
                 <div className="p-4 text-gray-500 text-center">
-                  No departments found
+                  {deptSearch ? "No departments found" : "No departments available"}
                 </div>
               )}
             </div>
@@ -179,34 +204,36 @@ const SearchPortal = () => {
               </div>
               <Input
                 type="text"
-                placeholder={
-                  selectedDept
-                    ? "Search teachers..."
-                    : "Select a department first"
-                }
+                placeholder={selectedDept ? "Search teachers..." : "Select a department first"}
                 value={teacherSearch}
                 onChange={(e) => setTeacherSearch(e.target.value)}
                 className="pl-10 mb-2 bg-white"
-                disabled={!selectedDept}
+                disabled={!selectedDept || isLoadingTeachers}
                 aria-label="Search teachers"
               />
             </div>
+
+            {teacherError && (
+              <Alert className="mb-2" variant="destructive">
+                <AlertDescription>{teacherError}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="max-h-48 overflow-auto border rounded-lg bg-white shadow-sm">
-              {selectedDept ? (
+              {isLoadingTeachers ? (
+                <div className="flex justify-center items-center h-20">
+                  <Loader className="h-6 w-6 animate-spin text-gray-500" />
+                </div>
+              ) : selectedDept ? (
                 filteredTeachers.length > 0 ? (
                   filteredTeachers.map((teacher) => (
                     <button
                       key={teacher.email}
-                      onClick={() => {
-                        setSelectedTeacher(teacher);
-                        setTeacherSearch("");
-                        setShowMobilePreview(true);
-                      }}
+                      onClick={() => handleTeacherSelect(teacher)}
                       className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 ${
-                        selectedTeacher?.email === teacher.email
-                          ? "bg-gray-50"
-                          : ""
-                      }`}>
+                        selectedTeacher?.email === teacher.email ? "bg-gray-50" : ""
+                      }`}
+                    >
                       <div className="font-medium text-gray-900">
                         {teacher.name}
                       </div>
@@ -217,7 +244,7 @@ const SearchPortal = () => {
                   ))
                 ) : (
                   <div className="p-4 text-gray-500 text-center">
-                    No teachers found
+                    {teacherSearch ? "No teachers found" : "No teachers available"}
                   </div>
                 )
               ) : (
@@ -233,7 +260,8 @@ const SearchPortal = () => {
             <div className="lg:hidden">
               <Button
                 className="w-full mb-4"
-                onClick={() => setShowMobilePreview(true)}>
+                onClick={() => setShowMobilePreview(true)}
+              >
                 View Preview
               </Button>
             </div>
@@ -242,24 +270,22 @@ const SearchPortal = () => {
       </div>
 
       {/* Right Panel - Preview */}
-      <div
-        className={`w-full lg:w-1/2 ${
-          !showMobilePreview && "hidden lg:block"
-        }`}>
+      <div className={`w-full lg:w-1/2 ${!showMobilePreview && "hidden lg:block"}`}>
         {selectedTeacher ? (
           <div className="h-full flex flex-col">
-            {/* Mobile Back Button - Enhanced */}
+            {/* Mobile Back Button */}
             <div className="lg:hidden sticky top-0 z-10 bg-white border-b">
               <Button
                 variant="ghost"
                 className="m-4 flex items-center text-gray-600"
-                onClick={() => setShowMobilePreview(false)}>
+                onClick={() => setShowMobilePreview(false)}
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Search
               </Button>
             </div>
 
-            {/* Top Section with Card - Mobile Optimized */}
+            {/* Preview Content */}
             <div className="p-4 lg:p-8">
               <Card className="shadow-sm border-0 bg-white">
                 <CardHeader className="px-4 py-3 border-b">
@@ -268,20 +294,16 @@ const SearchPortal = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-4">
-                  {/* Teacher Info - Mobile Optimized */}
+                  {/* Teacher Info */}
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">
-                          Department
-                        </span>
-                        <span className="font-medium">{selectedDept}</span>
+                        <span className="text-sm text-gray-500">Department</span>
+                        <span className="font-medium">{selectedDept.name}</span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm text-gray-500">Teacher</span>
-                        <span className="font-medium">
-                          {selectedTeacher.name}
-                        </span>
+                        <span className="font-medium">{selectedTeacher.name}</span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm text-gray-500">Email</span>
@@ -292,7 +314,7 @@ const SearchPortal = () => {
                     </div>
                   </div>
 
-                  {/* Link Section - Mobile Optimized */}
+                  {/* Link Section */}
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Input
@@ -305,7 +327,8 @@ const SearchPortal = () => {
                         onClick={() => handleCopy(generateShareableLink())}
                         variant="outline"
                         size="icon"
-                        className="shrink-0">
+                        className="shrink-0"
+                      >
                         {copied ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
@@ -314,8 +337,16 @@ const SearchPortal = () => {
                       </Button>
                     </div>
 
+                    {linkError && (
+                      <Alert className="bg-red-50 border-red-100">
+                        <AlertDescription className="text-red-800 text-sm">
+                          {linkError}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     {copied && (
-                      <Alert className="bg-green-50 border-green-100 py-2">
+                      <Alert className="bg-green-50 border-green-100">
                         <AlertDescription className="text-green-800 text-sm">
                           Link copied to clipboard!
                         </AlertDescription>
@@ -324,7 +355,8 @@ const SearchPortal = () => {
 
                     <Button
                       className="w-full bg-blue-600 hover:bg-blue-700"
-                      onClick={handleVisitFiles}>
+                      onClick={handleVisitFiles}
+                    >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Visit Shared Files
                     </Button>
@@ -333,7 +365,7 @@ const SearchPortal = () => {
               </Card>
             </div>
 
-            {/* Bottom Section with Preview - Mobile Optimized */}
+            {/* Page Preview Section */}
             <div className="flex-1 p-4 lg:p-8 pt-0">
               <Card className="h-full shadow-sm border-0">
                 <CardHeader className="px-4 py-3 border-b">
@@ -343,14 +375,12 @@ const SearchPortal = () => {
                 </CardHeader>
                 <CardContent className="p-0 h-[calc(100vh-24rem)] lg:h-[calc(100%-4rem)]">
                   <div className="w-full h-full bg-white relative">
-                    <iframe
-                      src={`/${getTeacherInitials(
-                        selectedTeacher.email
-                      )}/Sharedfiles`}
-                      className="w-full h-full absolute inset-0"
-                      title="Page Preview"
-                      style={{ maxHeight: "calc(100vh - 24rem)" }}
-                    />
+                  <iframe
+                        src={`/${getTeacherInitials(selectedTeacher.email)}/Sharedfiles`}
+                        className="w-full h-full absolute inset-0"
+                        title="Page Preview"
+                        style={{ maxHeight: "calc(100vh - 24rem)" }}
+                      />
                   </div>
                 </CardContent>
               </Card>

@@ -4,8 +4,8 @@
 3. In the backend create a `.env` file and add the values for the following:
     - **MONGO_URL**
     - **FRONTEND_URL:** URL of the frontend.
-    - **USER:** The email address of the account that will send the email, in case of the forgot password
-    - **APP_PASSWORD:** The password of the account that will send the email, in case of the forgot password. Check out any video of node-mailer to know how to set up the app password
+    - **EMAIL_USER:** The email address of the account that will send the email, in case of the forgot password
+    - **EMAIL_APP_PASSWORD:** The password of the account that will send the email, in case of the forgot password. Check out any video of node-mailer to know how to set up the app password
     - **PORT**
     - **JWT_SECRET**
     
