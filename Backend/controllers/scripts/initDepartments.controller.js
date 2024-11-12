@@ -11,28 +11,35 @@ const __dirname = path.dirname(__filename);
 
 // Configure environment variables
 const envPath = path.resolve(__dirname, '..', '..', '..', '.env');
-console.log('Looking for .env file at:', envPath);
+console.log(chalk.gray('Configuration:'));
+console.log(chalk.gray('→ ') + 'Loading .env from: ' + chalk.cyan(envPath));
 dotenv.config({ path: envPath });
 
-console.log('MONGO_URI:', process.env.MONGO_URI);
+console.log(chalk.gray('→ ') + 'Using MongoDB URI: ' + chalk.cyan(process.env.MONGO_URI));
 
 const logger = {
-    info: (msg) => console.log(chalk.blue('INFO: ') + msg),
-    success: (msg) => console.log(chalk.green('SUCCESS: ') + msg),
-    warning: (msg) => console.log(chalk.yellow('WARNING: ') + msg),
-    error: (msg) => console.log(chalk.red('ERROR: ') + msg),
-    divider: () => console.log(chalk.gray('-'.repeat(50)))
+    info: (msg) => console.log(chalk.blue('ℹ ') + msg),
+    success: (msg) => console.log(chalk.green('✓ ') + msg),
+    warning: (msg) => console.log(chalk.yellow('⚠ ') + msg),
+    error: (msg) => console.log(chalk.red('✗ ') + msg),
+    divider: () => console.log(chalk.gray('━'.repeat(50))),
+    header: (msg) => {
+        console.log(chalk.gray('━'.repeat(50)));
+        console.log(chalk.bold.blue(msg));
+        console.log(chalk.gray('━'.repeat(50)));
+    }
 };
 
 async function initializeDepartments() {
     try {
-        logger.info('Attempting to connect to MongoDB...');
+        logger.header('DEPARTMENT INITIALIZATION');
+        logger.info('Establishing database connection...');
         
         await mongoose.connect(process.env.MONGO_URI, {
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         });
-        logger.success('Connected to MongoDB');
+        logger.success('Connected to MongoDB successfully');
 
         const stats = {
             existing: 0,
@@ -41,11 +48,12 @@ async function initializeDepartments() {
             total: Object.entries(DEPARTMENT_MAP).length
         };
 
-        logger.info(`Processing ${stats.total} departments...`);
+        logger.header('PROCESSING DEPARTMENTS');
+        logger.info(`Found ${chalk.cyan(stats.total)} departments to process`);
 
         // Process each department
         for (const [departmentName, departmentID] of Object.entries(DEPARTMENT_MAP)) {
-            logger.info(`Processing department: ${departmentName} (${departmentID})`);
+            process.stdout.write(chalk.gray(`Processing: ${chalk.cyan(departmentName)} [${chalk.yellow(departmentID)}] ... `));
             
             try {
                 // Check if department exists
@@ -59,12 +67,13 @@ async function initializeDepartments() {
                 if (existingDepartment) {
                     if (existingDepartment.departmentID === departmentID && 
                         existingDepartment.name === departmentName) {
-                        logger.info(`Department already exists: ${departmentName} (${departmentID})`);
+                        process.stdout.write(chalk.yellow('EXISTS\n'));
                         stats.existing++;
                     } else {
+                        process.stdout.write(chalk.red('CONFLICT\n'));
                         logger.warning(
-                            `Conflict detected for ${departmentName} (${departmentID}). ` +
-                            `Existing record: ${existingDepartment.name} (${existingDepartment.departmentID})`
+                            `Conflict: ${chalk.cyan(departmentName)} (${chalk.yellow(departmentID)}) ` +
+                            `conflicts with existing: ${chalk.cyan(existingDepartment.name)} (${chalk.yellow(existingDepartment.departmentID)})`
                         );
                         stats.failed++;
                     }
@@ -85,27 +94,28 @@ async function initializeDepartments() {
                 });
 
                 await newDepartment.save();
-                logger.success(`Created new department: ${departmentName} (${departmentID})`);
+                process.stdout.write(chalk.green('CREATED\n'));
                 stats.created++;
 
             } catch (error) {
-                logger.error(`Failed to process ${departmentName}: ${error.message}`);
+                process.stdout.write(chalk.red('ERROR\n'));
+                logger.error(`Failed to process ${chalk.cyan(departmentName)}: ${chalk.red(error.message)}`);
                 stats.failed++;
             }
         }
 
         // Print summary
-        logger.divider();
-        logger.info('Initialization Summary:');
-        logger.info(`Total departments in mapping: ${stats.total}`);
-        logger.success(`Successfully created: ${stats.created}`);
-        logger.info(`Already existing: ${stats.existing}`);
-        logger.error(`Failed to process: ${stats.failed}`);
+        logger.header('INITIALIZATION SUMMARY');
+        console.log(chalk.bold('Statistics:'));
+        console.log(`${chalk.blue('Total Departments:')}    ${chalk.white(stats.total)}`);
+        console.log(`${chalk.green('Successfully Created:')} ${chalk.white(stats.created)}`);
+        console.log(`${chalk.yellow('Already Existing:')}    ${chalk.white(stats.existing)}`);
+        console.log(`${chalk.red('Failed to Process:')}    ${chalk.white(stats.failed)}`);
         logger.divider();
 
         // Verify final state
         const allDepartments = await DepartmentModel.find({});
-        logger.info(`Total departments in database: ${allDepartments.length}`);
+        logger.info(`Current database state: ${chalk.cyan(allDepartments.length)} total departments`);
 
         // Check for unmapped departments
         const extraDepartments = allDepartments.filter(
@@ -113,34 +123,46 @@ async function initializeDepartments() {
         );
 
         if (extraDepartments.length > 0) {
-            logger.warning('Found departments in database that are not in DEPARTMENT_MAP:');
+            logger.header('UNMAPPED DEPARTMENTS FOUND');
             extraDepartments.forEach(dept => {
-                logger.warning(`- ${dept.name} (${dept.departmentID})`);
+                logger.warning(`${chalk.yellow('→')} ${chalk.cyan(dept.name)} (${chalk.yellow(dept.departmentID)})`);
             });
         }
 
+        logger.divider();
+        if (stats.failed === 0 && stats.created + stats.existing === stats.total) {
+            logger.success(chalk.bold('Initialization completed successfully'));
+        } else {
+            logger.warning(chalk.bold('Initialization completed with some issues'));
+        }
+
     } catch (error) {
-        logger.error(`Fatal error: ${error.stack}`);
+        logger.header('FATAL ERROR');
+        logger.error(`${chalk.red(error.message)}`);
+        console.log(chalk.gray(error.stack));
         throw error;
     } finally {
         if (mongoose.connection.readyState === 1) {
+            logger.divider();
             logger.info('Closing database connection...');
             await mongoose.connection.close();
-            logger.info('Database connection closed');
+            logger.success('Database connection closed');
         }
     }
 }
 
-// Self-executing function with error handling
+// Main execution
 (async () => {
     try {
-        logger.info('Starting department initialization...');
+        logger.header('STARTING INITIALIZATION');
         await initializeDepartments();
-        logger.success('Script completed successfully');
     } catch (error) {
-        logger.error('Script failed with error:');
+        logger.error(chalk.bold('Script failed with error:'));
         logger.error(error.stack);
     } finally {
+        logger.divider();
         process.exit(0);
     }
 })();
+
+export { initializeDepartments };

@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Promisified CSV parsing function
-const parseCSV = async (filePath) => {
+export const parseCSV = async (filePath) => {
     return new Promise((resolve, reject) => {
         const results = [];
         fs.createReadStream(filePath)
@@ -34,7 +34,7 @@ const parseCSV = async (filePath) => {
 };
 
 // Main processing function
-const processFacultyCSV = async (filePath) => {
+export const processFacultyCSV = async (filePath) => {
     try {
         console.log('Step 1: Starting CSV processing');
         console.log('File path:', filePath);
@@ -67,23 +67,6 @@ const processFacultyCSV = async (filePath) => {
         const result = await addFacultyEntries(csvData);
         console.log('Step 6: Faculty entries processed');
 
-        // Log processing summary
-        console.log('Processing Summary:', {
-            totalRowsParsed: csvData.length,
-            successfulEntries: result.addedCount,
-            skippedEntries: result.skippedEntries?.length || 0
-        });
-
-        if (result.skippedEntries?.length > 0) {
-            console.log('Skipped entries details:', 
-                result.skippedEntries.map(entry => ({
-                    facultyID: entry.facultyID,
-                    name: entry.name,
-                    reason: entry.reason
-                }))
-            );
-        }
-
         return result;
     } catch (error) {
         console.error('Error:', error.message);
@@ -91,29 +74,32 @@ const processFacultyCSV = async (filePath) => {
     }
 };
 
-// Main execution
-console.log('Script started');
-const run = async () => {
-    try {
-        // Allow for custom file path from command line argument
-        const filePath = process.argv[2] || path.join(__dirname, '../../FacultyData/faculty_data.csv');
-        console.log('Using file path:', filePath);
+// // Main execution
+// console.log('Script started');
+// const run = async () => {
+//     try {
+//         // Allow for custom file path from command line argument
+//         const filePath = process.argv[2] || path.join(__dirname, '../../FacultyData/faculty_data.csv');
+//         console.log('Using file path:', filePath);
         
-        const result = await processFacultyCSV(filePath);
-        console.log('Final results:', result);
+//         const result = await processFacultyCSV(filePath);
+//         console.log('Final results:', result);
         
-        if (result.success) {
-            console.log('Faculty data import completed successfully');
-            process.exit(0);
-        } else {
-            console.error('Faculty data import completed with errors');
-            process.exit(1);
-        }
-    } catch (error) {
-        console.error('Fatal error:', error.message);
-        process.exit(1);
-    }
-};
+//         if (result.success) {
+//             console.log('Faculty data import completed successfully');
+//             process.exit(0);
+//         } else {
+//             console.error('Faculty data import completed with errors');
+//             process.exit(1);
+//         }
+//     } catch (error) {
+//         console.error('Fatal error:', error.message);
+//         process.exit(1);
+//     }
+// };
 
-// Run the script
-run().catch(console.error);
+
+// // Run the script if it's the main module
+// if (import.meta.url === `file://${process.argv[1]}`) {
+//     run().catch(console.error);
+// }

@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node -r dotenv/config server.js",
-    "dev": "nodemon -r dotenv/config server.js"
+    "dev": "nodemon -r dotenv/config server.js",
+    "init-departments": "node -r dotenv/config controllers/scripts/initDepartments.controller.js",
+    "init-faculty": "node -r dotenv/config controllers/scripts/initFaculty.controller.js",
+    "update-faculty": "node -r dotenv/config controllers/scripts/updateFaculty.controller.js"
   },
   "keywords": [],
   "author": "",
