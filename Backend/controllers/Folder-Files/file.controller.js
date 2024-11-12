@@ -10,7 +10,6 @@ import { TeacherFolderDir } from '../../config.js';
 
 
 const uploadFile = async (req, res) => {
-  console.log("Go fuck yourself");
   try {
     const { parentFolderId } = req.params;
     console.log("The parentFolderId is: ", parentFolderId);
@@ -32,12 +31,9 @@ const uploadFile = async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
-    console.log("Bruh wtf");
     const uploadedFiles = [];
+    fileShared = parentFolder.name === 'Root' ? false : parentFolder.isShared;    
 
-    parentFolder.isShared === true ? fileShared = true : fileShared = false;
-    
-    console.log("Working before the loop");
     for (let file of req.files) {
       const filePath = path.join(parentFolder.path, file.filename).replace(/\\/g, '\\\\');
       const nameWithoutExt = path.basename(file.originalname, path.extname(file.originalname));
@@ -73,7 +69,6 @@ const uploadFile = async (req, res) => {
         }
       }
     }
-    console.log("Working after the loop");
     res.status(201).json({
       success: true,
       message: 'Files uploaded successfully',

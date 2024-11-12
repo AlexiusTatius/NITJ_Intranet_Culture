@@ -24,6 +24,9 @@
 
 ## Keep your forked repository updated:
 
+DO NOT USE THE `Sync Fork` button on GitHub. It will create a merge commit, instead of a rebase commit. We need to keep the git history clean.
+
+**Update the forked repository using the below commands:**
 You need to keep your forked repository in sync with the original repository. Especially the **dev branch.**
 Here are the steps to do that **:**
 ```bash
@@ -32,6 +35,21 @@ git checkout dev
 git rebase upstream/dev
 git push origin dev
 ```
+
+If you want to update the master branch, you can do that using the below commands:
+```bash
+git checkout master
+git rebase upstream/master
+git push origin master
+```
+
+Similarly, you can update any feature branch using the below commands:
+```bash
+git checkout feature-branch
+git rebase upstream/dev
+git push origin feature-branch
+```
+
 
 ## Creating an feature branch for resolving issue: 
 

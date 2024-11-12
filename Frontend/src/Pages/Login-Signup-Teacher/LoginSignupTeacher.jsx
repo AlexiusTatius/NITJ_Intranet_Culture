@@ -1,49 +1,210 @@
-import React, { useState } from "react";  
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginSignupTeacher = () => {
+  const departments = [
+    {
+      display: "Computer Science and Engineering (CSE)",
+      value: "Computer Science and Engineering"
+    },
+    {
+      display: "Information Technology (IT)",
+      value: "Information Technology"
+    },
+    {
+      display: "Electrical Engineering (EE)",
+      value: "Electrical Engineering"
+    },
+    {
+      display: "Electronics and Communication Engineering (ECE)",
+      value: "Electronics and Communication Engineering"
+    },
+    {
+      display: "Mechanical Engineering (ME)",
+      value: "Mechanical Engineering"
+    },
+    {
+      display: "Instrumentation and Control Engineering (ICE)",
+      value: "Instrumentation and Control Engineering"
+    },
+    {
+      display: "Civil Engineering (CE)",
+      value: "Civil Engineering"
+    },
+    {
+      display: "Chemical Engineering (CHE)",
+      value: "Chemical Engineering"
+    },
+    {
+      display: "Industrial and Production Engineering (IPE)",
+      value: "Industrial and Production Engineering"
+    },
+    {
+      display: "Biotechnology (BT)",
+      value: "Biotechnology"
+    },
+    {
+      display: "Textile Technology (TT)",
+      value: "Textile Technology"
+    },
+    {
+      display: "Physics (PHY)",
+      value: "Physics"
+    },
+    {
+      display: "Mathematics (MATH)",
+      value: "Mathematics"
+    },
+    {
+      display: "Chemistry (CHEM)",
+      value: "Chemistry"
+    },
+    {
+      display: "Humanities and Management (HM)",
+      value: "Humanities and Management"
+    }
+  ];
+
   const [state, setState] = useState("Login");
-  const [formData, setFormData] = useState({username:"", email:"", password:""});
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    department: "",
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const passwordInputRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsFormValid(
+      formData.email !== "" &&
+        formData.password !== "" &&
+        formData.department !== "" &&
+        (state === "Login" || formData.username !== "") &&
+        !emailError
+    );
+  }, [formData, state, emailError]);
 
   const changeHandler = (event) => {
-    setFormData(prevFormData => ({
+    const { name, value } = event.target;
+
+    if (name === "department") {
+      // Find the department object that matches the selected display value
+      const selectedDept = departments.find(dept => dept.display === value);
+      // Set the backend value in formData
+      setFormData(prevFormData => ({
         ...prevFormData,
-        [event.target.name]: event.target.value
-    }));
-  }
+        [name]: selectedDept ? selectedDept.value : ""
+      }));
+    } else {
+      setFormData(prevFormData => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
+
+    setErrorMessage("");
+
+    if (name === "email") {
+      const emailPattern = /^[^\s@]+@nitj\.ac\.in$/;
+      if (!emailPattern.test(value)) {
+        setEmailError("Please enter a valid email in the format: name@nitj.ac.in");
+      } else {
+        setEmailError("");
+      }
+    }
+  };
 
   const toggleState = () => {
-    setState(prevState => prevState === "Login" ? "Sign Up" : "Login");
-  }
+    setState((prevState) => (prevState === "Login" ? "Sign Up" : "Login"));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const endpoint = state === "Login" ? 'login' : 'register';
-      const response = await apiTeacherInstance.post(`/${endpoint}`, formData);
-
-      const dataObj = response.data;
-      if (dataObj.success) {
-        localStorage.setItem('auth-token', dataObj.token);
-        // Handle successful login/signup
-      } else {
-        alert(dataObj.errors || 'An error occurred. Please try again.');
-      }
-    } catch (error) {
-      console.error(`Error during ${state.toLowerCase()}:`, error);
-      alert(error.response?.data?.message || `An error occurred. Please try again.`);
+    if (emailError) {
+        return;
     }
-  };
+
+    try {
+        const endpoint = state === "Login" ? "login" : "register";
+        const response = await axios.post(
+            `http://localhost:8001/api/user/Teacher/${endpoint}`,
+            formData
+        );
+
+        const dataObj = response.data;
+        
+        // Handle registration with verification
+        if (dataObj.success && state === "Sign Up") {
+            if (dataObj.showToast) {
+                console.log("Email verification sent!!!");
+                toast.success(
+                    <div>
+                        <p>{dataObj.toastMessage}</p>
+                        <p className="text-sm mt-1">Email: {dataObj.email}</p>
+                    </div>,
+                    {
+                        duration: 5000,
+                        position: "bottom-right",
+                    }
+                );
+            }
+            navigate("/Teacher/loginSignup");
+        }
+        // Handle successful login
+        else if (dataObj.success && state === "Login") {
+            localStorage.setItem("auth-token", dataObj.token);
+            navigate("/Teacher/Homepage/allfiles", { replace: true });
+        } 
+        // Handle errors
+        else if (dataObj.errors) {
+            toast.error(dataObj.errors, {
+                position: "bottom-right",
+            });
+        } else if (!dataObj.success && dataObj.message === "Incorrect password") {
+            toast.error("Incorrect password", {
+                position: "bottom-right",
+            });
+        } else {
+            toast.error("An error occurred. Please try again.", {
+                position: "bottom-right",
+            });
+        }
+    } catch (error) {
+        console.error(`Error during ${state.toLowerCase()}:`, error);
+        toast.error(
+            error.response?.data?.message || "An error occurred. Please try again.",
+            {
+                position: "bottom-right",
+            }
+        );
+    }
+};
 
   const handleNavigation = (path) => {
     navigate(path);
   };
 
-  return (
+  const handleEmailKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      passwordInputRef.current.focus();
+    }
+  };
+
+  const token = localStorage.getItem("auth-token");
+
+  return token ? null : (
     <div className="w-full min-h-screen bg-gradient-to-br from-green-100 to-blue-100 py-16 px-4 flex items-center justify-center">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -55,47 +216,95 @@ const LoginSignupTeacher = () => {
         <form onSubmit={handleSubmit} className="px-8 py-6 space-y-6">
           {state === "Sign Up" && (
             <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium text-gray-700">Username</label>
-              <input 
-                type="text" 
+              <label htmlFor="username" className="text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <input
+                type="text"
                 id="username"
-                placeholder="Your name" 
-                name="username" 
-                value={formData.username} 
+                placeholder="Your name"
+                name="username"
+                value={formData.username}
                 onChange={changeHandler}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />
             </div>
           )}
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-            <input 
-              type="email" 
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
               id="email"
-              placeholder="Email address" 
-              name="email" 
-              value={formData.email} 
+              placeholder="Email address"
+              name="email"
+              value={formData.email}
               onChange={changeHandler}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              onKeyDown={handleEmailKeyDown}
+              className={`w-full px-4 py-2 border ${
+                emailError ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
             />
+            {emailError && (
+              <div className="text-red-500 text-sm font-medium">
+                {emailError}
+              </div>
+            )}
           </div>
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-            <input 
-              type="password" 
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
               id="password"
-              placeholder="Password" 
-              name="password" 
-              value={formData.password} 
+              placeholder="Password"
+              name="password"
+              ref={passwordInputRef}
+              value={formData.password}
               onChange={changeHandler}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
             />
           </div>
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <div className="space-y-2 w-full sm:max-w-md">
+            <label htmlFor="department" className="text-sm font-medium text-gray-700">
+              Department
+            </label>
+            <div className="relative">
+              <select
+                id="department"
+                name="department"
+                value={departments.find(dept => dept.value === formData.department)?.display || ""}
+                onChange={changeHandler}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                style={{ maxHeight: "200px", overflowY: "scroll" }}
+              >
+                <option value="">Select Department</option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept.display}>
+                    {dept.display}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {errorMessage && (
+            <div className="text-red-500 text-sm font-medium">
+              {errorMessage}
+            </div>
+          )}
+          <motion.button
+            whileHover={isFormValid ? { scale: 1.05 } : {}}
+            whileTap={isFormValid ? { scale: 0.95 } : {}}
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
+            disabled={!isFormValid}
+            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-200 ${
+              isFormValid
+                ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                : "bg-blue-300 text-white cursor-not-allowed"
+            }`}
           >
             Continue
           </motion.button>
@@ -104,15 +313,33 @@ const LoginSignupTeacher = () => {
           {state === "Login" ? (
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
-                Don't have an account? <span onClick={toggleState} className="text-blue-600 cursor-pointer hover:underline font-medium">Sign Up here</span>
+                Don't have an account?{" "}
+                <span
+                  onClick={toggleState}
+                  className="text-blue-600 cursor-pointer hover:underline font-medium"
+                >
+                  Sign Up here
+                </span>
               </p>
               <p className="text-sm text-gray-600">
-                Forgot your Password? <span onClick={() => handleNavigation('/user/ForgotPassword')} className="text-blue-600 cursor-pointer hover:underline font-medium">Reset Password</span>
+                Forgot your Password?{" "}
+                <span
+                  onClick={() => handleNavigation("/user/ForgotPassword")}
+                  className="text-blue-600 cursor-pointer hover:underline font-medium"
+                >
+                  Reset Password
+                </span>
               </p>
             </div>
           ) : (
             <p className="text-sm text-gray-600">
-              Already have an account? <span onClick={toggleState} className="text-blue-600 cursor-pointer hover:underline font-medium">Log In here</span>
+              Already have an account?{" "}
+              <span
+                onClick={toggleState}
+                className="text-blue-600 cursor-pointer hover:underline font-medium"
+              >
+                Login here
+              </span>
             </p>
           )}
         </div>

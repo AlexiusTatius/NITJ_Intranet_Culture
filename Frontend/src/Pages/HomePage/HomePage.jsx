@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, UserPlus } from 'lucide-react';
 
 const HomePage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('auth-token');
+    if (token) {
+      // If logged in, redirect to the appropriate page
+      navigate('/Teacher/Homepage/allfiles', { replace: true });
+    }
+  }, [navigate]);
 
   const buttonVariants = {
     hover: { scale: 1.05 },
@@ -34,12 +43,13 @@ const HomePage = () => {
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
-              className="w-full flex items-center justify-center bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-lg font-medium"
+              className="w-full flex items-center justify-center bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-lg font-medium"
             >
               <User className="mr-2" size={24} />
               Teacher
             </motion.button>
-            <motion.button 
+            {/* This section will be developed in version 3 or 4 when we start building the intranet for students, so the idea is quite far in the future  */}
+            {/* <motion.button 
               onClick={() => handleNavigation('/Student/loginSignup')}
               variants={buttonVariants}
               whileHover="hover"
@@ -48,7 +58,7 @@ const HomePage = () => {
             >
               <UserPlus className="mr-2" size={24} />
               Student
-            </motion.button>
+            </motion.button> */}
           </div>
         </div>
       </motion.div>
@@ -57,5 +67,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-

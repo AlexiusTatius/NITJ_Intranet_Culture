@@ -1,9 +1,12 @@
 import React from 'react';
 import PdfViewer from '../../Components/PdfViewer/PdfViewer';
-import { useNavigate } from 'react-router-dom';
+import PdfViewerStudent from '../../Components/PdfViewer/PdfViewerStudent';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 
 const PdfViewerPage = () => {
+  const { teacherEmailInitials } = useParams();
+  console.log("The teacher email initials are: ", teacherEmailInitials);
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -20,7 +23,7 @@ const PdfViewerPage = () => {
         <h1 className="m-0 text-2xl font-bold text-gray-800">PDF Viewer</h1>
       </header>
       <main className="flex-grow overflow-hidden">
-        <PdfViewer />
+        {teacherEmailInitials ? <PdfViewerStudent/> : <PdfViewer />}
       </main>
     </div>
   );

@@ -2,15 +2,18 @@ import cors from 'cors';
 import express from 'express';
 import dotenv from "dotenv"
 import mongoose from 'mongoose';
-
-// import uploadRoutes from './routes/uploads.route.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import TeacherUserRoute from './routes/UserRoutes/TeacherUser.route.js'
 import StudentUserRoute from './routes/UserRoutes/StudentUser.route.js'
 import forgotPasswordRoute from './routes/UserRoutes/forgotPassword.route.js'
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// App config
-dotenv.config()
+// env config
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
 const app = express()
 const port = process.env.PORT || 8000
 mongoose.set('strictQuery', true);
@@ -24,7 +27,7 @@ mongoose.connect(process.env.MONGO_URI)  // Here I don't have to specify the dat
 // Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173"
+    origin: process.env.FRONTEND_BASE_URL || "http://localhost:5173"
 }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,7 +39,7 @@ app.use("/api/user/Student", StudentUserRoute)
 app.use("/api/user/forgotPassword", forgotPasswordRoute)
 // app.use("/api/uploads", uploadRoutes)
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`)
 });
 

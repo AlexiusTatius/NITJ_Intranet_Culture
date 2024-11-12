@@ -1,9 +1,12 @@
 import express from 'express';
 import requireAuth from '../../middlewares/requireAuth.middleware.js';
+import studentPublicViewMiddleware from '../../middlewares/studentView.middleware.js';
 import {uploadMiddleware, fileUploadErrorHandler} from '../../middlewares/multerUpload.middleware.js';
 import {createFolder, deleteFolder, renameFolder, getFolderStructure} from '../../controllers/Folder-Files/folder.controller.js'
 import {uploadFile, deleteFile, downloadFile, getPdfFile, renameFile} from '../../controllers/Folder-Files/file.controller.js';
 import {shareFolderFxn, shareFileFxn, unshareFolderFxn ,unshareFileFxn, getSharedStructure} from '../../controllers/SharedFolderFiles/shareFolderFiles.controller.js';
+import {generateUniqueShareableLink, generatePdfLink} from '../../controllers/GenerateURL/generateURL.controller.js';
+import {getDepartments, getTeachersByDepartment} from '../../controllers/SearchPortal/searchPortal.controller.js';
 const router = express.Router()
 
 router.post("/createFolder", requireAuth, createFolder); // check
@@ -22,5 +25,16 @@ router.put('/shareFile/:fileId', requireAuth, shareFileFxn);
 router.put('/unshareFolder/:folderId', requireAuth, unshareFolderFxn);
 router.put('/unshareFile/:fileId', requireAuth, unshareFileFxn);
 router.get("/sharedStructure/:folderId", requireAuth, getSharedStructure);
+
+router.get("/generateUniqueShareableLink", requireAuth, generateUniqueShareableLink);
+router.get("/generatePdfLink/:fileId", requireAuth, generatePdfLink); 
+
+// Add these routes before the studentPublicViewMiddleware routes
+router.get('/departments', getDepartments);
+router.get('/teachers/:departmentId', getTeachersByDepartment);
+
+router.get("/sharedStructure/:teacherEmailInitials/:folderId", studentPublicViewMiddleware, getSharedStructure);
+router.get("/getPdfFile/:teacherEmailInitials/:fileId", studentPublicViewMiddleware, getPdfFile); //check
+
 
 export default router;  

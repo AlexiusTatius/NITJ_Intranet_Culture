@@ -7,7 +7,7 @@ const escapeRegExp = (string) => {
 };
 
 // 1. Share Folder Function
-const  shareFolderFxn = async (req, res) => {
+const shareFolderFxn = async (req, res) => {
   try {
     const { folderId } = req.params;
     const userObject = req.user;
@@ -26,12 +26,12 @@ const  shareFolderFxn = async (req, res) => {
 
     // Update the folder and all its subfolders
     await FolderModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${folderPathRegex}(\\\\|$)` }
       },
-      { 
-        $set: { 
+      {
+        $set: {
           isShared: true,
           updatedAt: new Date()
         }
@@ -40,12 +40,12 @@ const  shareFolderFxn = async (req, res) => {
 
     // Update all files within the folder
     await FileModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${folderPathRegex}(\\\\|$)` }
       },
-      { 
-        $set: { 
+      {
+        $set: {
           isShared: true,
           updatedAt: new Date()
         }
@@ -106,13 +106,13 @@ const unshareFolderFxn = async (req, res) => {
 
     // Update the folder and all its subfolders
     await FolderModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${folderPathRegex}(\\\\|$)` },
         isShared: true // Only update folders that are currently shared
       },
-      { 
-        $set: { 
+      {
+        $set: {
           isShared: false,
           updatedAt: new Date()
         }
@@ -121,13 +121,13 @@ const unshareFolderFxn = async (req, res) => {
 
     // Update all files within the folder
     await FileModel.updateMany(
-      { 
+      {
         owner: userId,
         path: { $regex: `^${folderPathRegex}(\\\\|$)` },
         isShared: true // Only update files that are currently shared
       },
-      { 
-        $set: { 
+      {
+        $set: {
           isShared: false,
           updatedAt: new Date()
         }
@@ -175,9 +175,9 @@ const getSharedStructure = async (req, res) => {
     const userId = req.user._id;
     const { folderId } = req.params;
 
-    let targetFolder; 
+    let targetFolder;
     // root folder must be shared by default, else it's inner subfolder could never be fetched.
-    
+
     if (folderId === 'root') {
       targetFolder = await FolderModel.findOne({ isShared: true, owner: userId, parentFolder: null }).lean();
     } else {
@@ -192,16 +192,16 @@ const getSharedStructure = async (req, res) => {
     }
 
     // Get all shared subfolders of the target folder
-    const subFolders = await FolderModel.find({ 
+    const subFolders = await FolderModel.find({
       isShared: true,
-      owner: userId, 
-      path: { $regex: `^${escapeRegExp(targetFolder.path)}(\\\\|$)` }
+      owner: userId,
+      path: { $regex: `^${escapeRegExp(targetFolder.path)}([\\\\/]|$)` }
     }).lean();
 
     // Get all shared files in the target folder
-    const files = await FileModel.find({ 
+    const files = await FileModel.find({
       isShared: true,
-      owner: userId, 
+      owner: userId,
       parentFolder: targetFolder._id
     }).lean();
 

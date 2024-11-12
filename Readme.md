@@ -4,8 +4,8 @@
 3. In the backend create a `.env` file and add the values for the following:
     - **MONGO_URL**
     - **FRONTEND_URL:** URL of the frontend.
-    - **USER:** The email address of the account that will send the email, in case of the forgot password
-    - **APP_PASSWORD:** The password of the account that will send the email, in case of the forgot password. Check out any video of node-mailer to know how to set up the app password
+    - **EMAIL_USER:** The email address of the account that will send the email, in case of the forgot password
+    - **EMAIL_APP_PASSWORD:** The password of the account that will send the email, in case of the forgot password. Check out any video of node-mailer to know how to set up the app password
     - **PORT**
     - **JWT_SECRET**
     
@@ -47,6 +47,17 @@
     plugins: [],
     }
 
+    ```
+8. In **Backend:**
+    Run the following scripts to load the department and `faculty_data.csv` into the MongoDB database:
+    ```JSON
+    Initial Setup:
+    1. npm run init-department    (runs once when setting up system to initialize the departments)
+    2. npm run init-faculty       (runs once when setting up system to initialize the faculty data)
+    
+    Later Updates:
+    1. Update faculty_data.csv with new entries
+    2. npm run update-faculty  (can be run multiple times safely)
     ```
 
 
