@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginSignupTeacher = () => {
   const departments = [
@@ -128,34 +130,64 @@ const LoginSignupTeacher = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (emailError) {
-      return;
+        return;
     }
 
     try {
-      const endpoint = state === "Login" ? "login" : "register";
-      const response = await axios.post(
-        `http://localhost:8001/api/user/Teacher/${endpoint}`,
-        formData
-      );
+        const endpoint = state === "Login" ? "login" : "register";
+        const response = await axios.post(
+            `http://localhost:8001/api/user/Teacher/${endpoint}`,
+            formData
+        );
 
-      const dataObj = response.data;
-      if (dataObj.success) {
-        localStorage.setItem("auth-token", dataObj.token);
-        navigate("/Teacher/Homepage/allfiles", { replace: true });
-      } else if (dataObj.errors) {
-        setErrorMessage(dataObj.errors);
-      } else if (!dataObj.success && dataObj.message === "Incorrect password") {
-        setErrorMessage("Incorrect password");
-      } else {
-        setErrorMessage("An error occurred. Please try again.");
-      }
+        const dataObj = response.data;
+        
+        // Handle registration with verification
+        if (dataObj.success && state === "Sign Up") {
+            if (dataObj.showToast) {
+                console.log("Email verification sent!!!");
+                toast.success(
+                    <div>
+                        <p>{dataObj.toastMessage}</p>
+                        <p className="text-sm mt-1">Email: {dataObj.email}</p>
+                    </div>,
+                    {
+                        duration: 5000,
+                        position: "bottom-right",
+                    }
+                );
+            }
+            navigate("/Teacher/loginSignup");
+        }
+        // Handle successful login
+        else if (dataObj.success && state === "Login") {
+            localStorage.setItem("auth-token", dataObj.token);
+            navigate("/Teacher/Homepage/allfiles", { replace: true });
+        } 
+        // Handle errors
+        else if (dataObj.errors) {
+            toast.error(dataObj.errors, {
+                position: "bottom-right",
+            });
+        } else if (!dataObj.success && dataObj.message === "Incorrect password") {
+            toast.error("Incorrect password", {
+                position: "bottom-right",
+            });
+        } else {
+            toast.error("An error occurred. Please try again.", {
+                position: "bottom-right",
+            });
+        }
     } catch (error) {
-      console.error(`Error during ${state.toLowerCase()}:`, error);
-      setErrorMessage(
-        error.response?.data?.message || "An error occurred. Please try again."
-      );
+        console.error(`Error during ${state.toLowerCase()}:`, error);
+        toast.error(
+            error.response?.data?.message || "An error occurred. Please try again.",
+            {
+                position: "bottom-right",
+            }
+        );
     }
-  };
+};
 
   const handleNavigation = (path) => {
     navigate(path);

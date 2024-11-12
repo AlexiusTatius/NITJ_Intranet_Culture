@@ -6,6 +6,7 @@ import {createFolder, deleteFolder, renameFolder, getFolderStructure} from '../.
 import {uploadFile, deleteFile, downloadFile, getPdfFile, renameFile} from '../../controllers/Folder-Files/file.controller.js';
 import {shareFolderFxn, shareFileFxn, unshareFolderFxn ,unshareFileFxn, getSharedStructure} from '../../controllers/SharedFolderFiles/shareFolderFiles.controller.js';
 import {generateUniqueShareableLink, generatePdfLink} from '../../controllers/GenerateURL/generateURL.controller.js';
+import {getDepartments, getTeachersByDepartment} from '../../controllers/SearchPortal/searchPortal.controller.js';
 const router = express.Router()
 
 router.post("/createFolder", requireAuth, createFolder); // check
@@ -28,6 +29,9 @@ router.get("/sharedStructure/:folderId", requireAuth, getSharedStructure);
 router.get("/generateUniqueShareableLink", requireAuth, generateUniqueShareableLink);
 router.get("/generatePdfLink/:fileId", requireAuth, generatePdfLink); 
 
+// Add these routes before the studentPublicViewMiddleware routes
+router.get('/departments', getDepartments);
+router.get('/teachers/:departmentId', getTeachersByDepartment);
 
 router.get("/sharedStructure/:teacherEmailInitials/:folderId", studentPublicViewMiddleware, getSharedStructure);
 router.get("/getPdfFile/:teacherEmailInitials/:fileId", studentPublicViewMiddleware, getPdfFile); //check

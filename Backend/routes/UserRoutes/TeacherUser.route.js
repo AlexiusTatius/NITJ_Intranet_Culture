@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/login",loginUser);
 router.post("/register",verificationBeforeRegister);
-router.post("/verify-email", verifyEmail);
+router.get("/verify-email", verifyEmail);
 router.get("/getuser", requireAuth, getUser)   // don't know about this one might have to delete
 
 router.use("/file-folder",TeacherFolderRoute);

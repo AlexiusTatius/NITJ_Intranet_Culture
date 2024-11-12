@@ -115,21 +115,28 @@ const verificationBeforeRegister = async (req, res) => {
         const departmentId = TeacherFaculty.department.departmentID;        
 
         // Send verification email
+        // In the try block, after email sending:
         const emailSent = await EmailUtils.sendVerificationEmail(email, verificationToken, departmentId, username);
-        
+
         if (!emailSent.success) {
             // If email fails, delete the user and return error
             await TeacherUserModel.findByIdAndDelete(user._id);
             return res.status(500).json({ 
                 success: false, 
-                message: "Failed to send verification email" 
+                message: "Failed to send verification email",
+                showToast: true,
+                toastType: 'error'
             });
         }
 
         res.status(200).json({ 
             success: true, 
             message: "Registration initiated. Please check your email to verify your account.",
-            verificationPending: true
+            verificationPending: true,
+            showToast: true,
+            toastType: 'success',
+            toastMessage: 'Verification link sent to your email! Please check your inbox.',
+            email: email // So frontend can display which email address was used
         });
 
     } catch (error) {
@@ -157,21 +164,31 @@ const verifyEmail = async (req, res) => {
         console.log("Bruh2");
 
         if (!user) {
-            const expiredTokenUser = await TeacherUserModel.findByDepartmentAndEmail( departmentId, userEmail );
-            // delete the user if verification token is invalid or expired
-            if(expiredTokenUser) {
-                // delete the user
+            const expiredTokenUser = await TeacherUserModel.findByDepartmentAndEmail(departmentId, userEmail);
+            
+            if (expiredTokenUser) {
+                // Delete user with expired token
                 await expiredTokenUser.deleteOne();
-                console.log('User deleted:', expiredTokenUser);
-
+                
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid or expired verification token"
+                    message: "Verification link has expired. Please register again.",
+                    showToast: true,
+                    toastType: 'error'
                 });
             }
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid verification link",
+                showToast: true,
+                toastType: 'error'
+            });
         }
         console.log("Bruh3");
         // Update user verification status
+        console.log("user:", user);
+
         user.isEmailVerified = true;
         console.log("Bruh4");
         user.verificationToken = undefined;
@@ -184,11 +201,13 @@ const verifyEmail = async (req, res) => {
         await user.deleteOne();
         await finalRegistrationAfterVerification(userCopy, res);
 
-    } catch (error) {
+    }  catch (error) {
         console.error('Verification error:', error);
         res.status(500).json({
             success: false,
-            message: "An error occurred during verification"
+            message: "An error occurred during verification",
+            showToast: true,
+            toastType: 'error'
         });
     }
 };
